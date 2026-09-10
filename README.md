@@ -1,0 +1,2 @@
+# PanasRPG
+proyecto no sql 
