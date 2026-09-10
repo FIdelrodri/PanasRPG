@@ -1,0 +1,20 @@
+# 1. Inicializás Git en tu carpeta local
+git init
+
+# 2. Vinculás directamente con el repositorio de tu Casino
+git remote add origin https://github.com/FIdelrodri/PanasRPG.git
+
+# 3. Te parás en la rama principal
+git branch -M main
+
+# 5. Descargás los archivos (Le agregamos la bandera para evitar errores de historial)
+git pull origin main --allow-unrelated-histories
+---------
+# 1. Registrás todo lo nuevo, modificado o borrado
+git add .
+
+# 2. Guardás el punto de control local
+git commit -m "Actualizo el proyecto del Casino"
+
+# 3. Lo mandás directo a la main en internet
+git push origin main
