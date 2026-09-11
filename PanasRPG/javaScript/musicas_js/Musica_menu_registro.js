@@ -1,18 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // CONFIGURA AQUÍ TU ARCHIVO DE MÚSICA
+  // CONFIGURACIÓN
   const RUTA_MUSICA = '../../../audio/canciones/musica_cancion_menu.mp3'; 
+  const VOLUMEN_INICIAL = 0.5; // Ajusta el volumen aquí (0.0 = silencio, 1.0 = máximo)
 
   // Crear el elemento de audio en memoria
   const audio = new Audio(RUTA_MUSICA);
   audio.loop = true;
+  audio.volume = VOLUMEN_INICIAL; // Aplicar volumen configurado
 
   // Intento 1: Reproducir automáticamente si el navegador lo permite
   const intentarAutoplay = () => {
     audio.play().then(() => {
-      // Si la reproducción fue exitosa, limpiamos los eventos
       removerEscuchadores();
     }).catch(() => {
-      // Si el navegador bloqueó el autoplay silenciosamente, esperamos interacción
       console.log('Autoplay bloqueado. Esperando primera interacción del usuario...');
     });
   };

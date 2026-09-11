@@ -1,20 +1,3 @@
-/* =========================================================
-   FatRPG · Registro (versión modular, por piezas)
-   -----------------------------------------------------------
-   Cada elemento del arte es un archivo suelto:
-     img/fondo_bosque.png        -> fondo de la escena
-     img/panel_registro.png      -> cartel "FatRPG / Registrarse" con las 3 ranuras
-     img/boton_registrarse.png   -> botón verde "Registrarse"
-     img/ya_tienes_cuenta.png    -> cartel "¿Ya tienes una cuenta?"
-
-   Si en el futuro querés cambiar el botón, el panel, o el fondo,
-   solo reemplazás ESE archivo (o ese bloque de CSS) sin tocar
-   el resto. No dependemos de una sola imagen fusionada.
-
-   ⚠️ Ajustá las rutas de "img/..." según donde termines
-   guardando los archivos dentro de tu repo.
-   ========================================================= */
-
 * {
   box-sizing: border-box;
 }
@@ -79,9 +62,9 @@ body {
   width: 30.1%;
 }
 
-.campo--usuario  { top: 40.7%; height: 8.5%; }
-.campo--correo   { top: 51.8%; height: 7.6%; }
-.campo--password { top: 62.8%; height: 7.6%; }
+.campo--usuario  { top: 42%; height: 8.5%; }
+.campo--password   { top: 53.8%; height: 7.6%; }
+.campo--password1 { top: 64.8%; height: 7.6%; }
 
 .campo input {
   width: 100%;
