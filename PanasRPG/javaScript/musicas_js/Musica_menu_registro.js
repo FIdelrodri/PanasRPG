@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   // CONFIGURACIÓN
-  const RUTA_MUSICA = '../../../audio/canciones/musica_cancion_menu.mp3'; 
+  const RUTA_MUSICA = '../../../PanasRPG/audio/canciones/musica_cancion_menu.mp3'; 
   const VOLUMEN_INICIAL = 0.5; // Ajusta el volumen aquí (0.0 = silencio, 1.0 = máximo)
 
   // Crear el elemento de audio en memoria
