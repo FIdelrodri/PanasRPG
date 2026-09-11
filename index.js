@@ -6,9 +6,9 @@ const PORT = 3000;
 // Servir todos los archivos estáticos de la carpeta (HTML, CSS, JS, imágenes)
 app.use(express.static(__dirname));
 
-// Ruta principal: envía el archivo index.html
+// Ruta principal: envía el menú de registro
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'PanasRPG', 'Vistas', 'Menus', 'Registro', 'registro.html'));
 });
 
 app.listen(PORT, () => {

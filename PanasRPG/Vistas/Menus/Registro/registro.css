@@ -1,0 +1,158 @@
+/* =========================================================
+   FatRPG · Registro (versión modular, por piezas)
+   -----------------------------------------------------------
+   Cada elemento del arte es un archivo suelto:
+     img/fondo_bosque.png        -> fondo de la escena
+     img/panel_registro.png      -> cartel "FatRPG / Registrarse" con las 3 ranuras
+     img/boton_registrarse.png   -> botón verde "Registrarse"
+     img/ya_tienes_cuenta.png    -> cartel "¿Ya tienes una cuenta?"
+
+   Si en el futuro querés cambiar el botón, el panel, o el fondo,
+   solo reemplazás ESE archivo (o ese bloque de CSS) sin tocar
+   el resto. No dependemos de una sola imagen fusionada.
+
+   ⚠️ Ajustá las rutas de "img/..." según donde termines
+   guardando los archivos dentro de tu repo.
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #16220f; /* respaldo por si el fondo no llega a cubrir */
+  font-family: 'Cinzel', 'Trebuchet MS', Georgia, serif;
+}
+
+/* --- Fondo de bosque, pieza independiente --- */
+.escena {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-image: url('../../../imagenes/Fondos/Fondo_registro.jpg');
+  background-size: cover;
+  background-position: center;
+  padding: 4vh 2vw;
+}
+
+/* --- Tarjeta: agrupa panel + botón + link, uno debajo del otro --- */
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: clamp(280px, 32vw, 520px);
+  margin: 0;
+  border: none;
+  padding: 0;
+}
+
+/* --- Panel de madera (pieza independiente) --- */
+.panel-wrap {
+  position: relative;
+  width: 200%;
+}
+
+.panel-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Campos de texto posicionados sobre las 3 ranuras dibujadas
+   en panel_registro.png (medidos como % del propio panel,
+   así se mantienen alineados sea cual sea el tamaño de pantalla) */
+.campo {
+  position: absolute;
+  left: 35.2%;
+  width: 30.1%;
+}
+
+.campo--usuario  { top: 40.7%; height: 8.5%; }
+.campo--correo   { top: 51.8%; height: 7.6%; }
+.campo--password { top: 62.8%; height: 7.6%; }
+
+.campo input {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #f1e0b8;
+  font-family: inherit;
+  font-size: clamp(9px, 1.3vw, 16px);
+  padding: 0 4%;
+  letter-spacing: 0.5px;
+}
+
+.campo input::placeholder {
+  color: rgba(241, 224, 184, 0.55);
+}
+
+.campo input:focus {
+  box-shadow: inset 0 0 0 2px rgba(241, 224, 184, 0.6);
+  border-radius: 4px;
+}
+
+/* --- Botón "Registrarse" (pieza independiente) ---
+   margin-top negativo para que se acomode pegado al panel,
+   igual que en el mockup. Tocá este valor si cambiás el
+   tamaño de las imágenes. */
+.btn-registrarse {
+  width: 72%;
+  margin-top: -30%;
+  z-index: 2;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.btn-registrarse img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.btn-registrarse:hover img {
+  filter: brightness(1.08);
+}
+
+.btn-registrarse:focus-visible {
+  outline: 2px solid #f1e0b8;
+  outline-offset: 3px;
+}
+
+/* --- Cartel "¿Ya tienes una cuenta?" (pieza independiente) --- */
+.link-login {
+  display: block;
+  width: 60%;
+  margin-top: -3%;
+  cursor: pointer;
+}
+
+.link-login img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.link-login:hover img {
+  filter: brightness(1.1);
+}
+
+.link-login:focus-visible {
+  outline: 2px solid #f1e0b8;
+  outline-offset: 3px;
+}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FatRPG · Registrarse</title>
+  <link rel="stylesheet" href="../Registro/registro.css">
+</head>
+<body>
+  <script src="../../../javaScript/musicas_js/Musica_menu_registro.js"></script>
+  <main class="escena">
+    <form class="tarjeta" autocomplete="off">
+
+      <!-- Panel de madera (título + header + 3 ranuras dibujadas) -->
+      <div class="panel-wrap">
+        <img src="/../../PanasRPG/imagenes/menus/registro/panel_registro.png" alt="FatRPG - Registrarse" class="panel-img">
+
+        <div class="campo campo--usuario">
+          <input type="text" id="usuario" name="usuario" placeholder="Usuario" required>
+        </div>
+
+        <div class="campo campo--correo">
+          <input type="email" id="correo" name="correo" placeholder="Correo electrónico" required>
+        </div>
+
+        <div class="campo campo--password">
+          <input type="password" id="password" name="password" placeholder="Contraseña" required>
+        </div>
+      </div>
+
+      <!-- Botón de registro (imagen suelta) -->
+      <button type="submit" class="btn-registrarse">
+        <img src="/../../PanasRPG/imagenes/menus/registro/boton_registrarse.png" alt="Registrarse">
+      </button>
+
+      <!-- Cartel "¿Ya tienes una cuenta?" (imagen suelta) -->
+      <a href="../inicio/inicio.html" class="link-login">
+        <img src="/../../PanasRPG/imagenes/menus/registro/ya_tienes_cuenta.png" alt="¿Ya tienes una cuenta? Inicia sesión.">
+      </a>
+
+    </form>
+  </main>
+
+</body>
+</html>
