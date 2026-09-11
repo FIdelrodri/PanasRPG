@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // CONFIGURACIÓN
+  // variables de configuración
   const RUTA_MUSICA = '../../../audio/canciones/musica_cancion_menu.mp3'; 
-  const VOLUMEN_INICIAL = 0.5; // Ajusta el volumen aquí (0.0 = silencio, 1.0 = máximo)
+  const VOLUMEN_INICIAL = 0.4; 
 
   // Crear el elemento de audio en memoria
   const audio = new Audio(RUTA_MUSICA);
