@@ -1,6 +1,7 @@
 # PanasRPG
 proyecto no sql 
 
+
 ```
 www
 ├─ conexion github.txt
@@ -20,7 +21,7 @@ www
 │  │  │  └─ relleno.txt
 │  │  ├─ Fondos
 │  │  │  ├─ 023751f8-d502-458b-83db-92b743cb2386 (1).png
-│  │  │  ├─ fondo_bosque.png
+│  │  │  ├─ fondo_login.png
 │  │  │  └─ Fondo_registro.jpg
 │  │  ├─ imangenes_MISC
 │  │  │  └─ logo.png
@@ -34,6 +35,10 @@ www
 │  │  │  └─ Personajes
 │  │  │     └─ Personaje ejemplo.png
 │  │  └─ menus
+│  │     ├─ inicio
+│  │     │  ├─ boton_login.png
+│  │     │  ├─ notienesunacuenta.png
+│  │     │  └─ panel_login.png
 │  │     └─ registro
 │  │        ├─ boton_registrarse.png
 │  │        ├─ panel_registro.png
@@ -41,17 +46,17 @@ www
 │  ├─ javaScript
 │  │  ├─ musicas_js
 │  │  │  └─ Musica_menu_registro.js
-│  │  └─ relleno.txt
+│  │  └─ registro.js
 │  ├─ Metodos
-│  │  ├─ relleno.txt
+│  │  ├─ db.js
 │  │  └─ seed.js
 │  ├─ Nosql
-│  │  └─ relleno.txt
-│  ├─ relleno.txt
+│  │  └─ sistema_completo.json
 │  └─ Vistas
 │     ├─ Menus
 │     │  ├─ inicio
-│     │  │  └─ relleno.txt
+│     │  │  ├─ inicio.css
+│     │  │  └─ inicio.html
 │     │  └─ Registro
 │     │     ├─ registro.css
 │     │     └─ registro.html
