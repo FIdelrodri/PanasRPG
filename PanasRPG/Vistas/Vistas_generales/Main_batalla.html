@@ -1,23 +1,35 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FatRPG · Combate</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PanasRPG — Batalla</title>
+  <link rel="stylesheet" href="tema.css">
+  <link rel="stylesheet" href="Main_batalla.css">
 </head>
-<body>
+<body class="vista-batalla">
+
+  <header class="encabezado">
+    <button type="button" class="boton boton--sutil" id="btn-volver">Volver al menú</button>
+    <div class="encabezado__titulos">
+      <p class="encabezado__tipo" id="bt-tipo"></p>
+      <h1 class="encabezado__titulo" id="bt-titulo">Preparando la batalla…</h1>
+    </div>
+    <button type="button" class="boton boton--sutil" id="btn-logout">Cerrar sesión</button>
+  </header>
+
+  <main class="datos" id="datos" aria-live="polite"></main>
+
+  <section class="crudo">
+    <details>
+      <summary>Ver los datos tal como llegan (JSON)</summary>
+      <pre id="crudo"></pre>
+    </details>
+  </section>
+
+  <div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+
   <script src="../../javaScript/sesion.js"></script>
-
-  <main>
-    <h1>Vista de combate</h1>
-    <p>Vista protegida: solo se llega acá con una sesión iniciada (login correcto).</p>
-    <p>Acá va la resolución del combate automático contra el enemigo elegido, con su fondo y sprite correspondientes.</p>
-
-    <nav>
-      <a href="Main_game.html">Volver al menú principal</a>
-    </nav>
-
-    <button id="btn-logout" type="button">Cerrar sesión</button>
-  </main>
+  <script src="../../javaScript/batalla.js"></script>
 </body>
 </html>

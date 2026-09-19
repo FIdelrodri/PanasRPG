@@ -1,0 +1,150 @@
+/*
+  Main_batalla.css — vista de batalla
+  Muestra los datos de la pelea en paneles con listas etiqueta/valor.
+*/
+
+.vista-batalla {
+  background-image: var(--img-fondo-batalla);
+  background-size: cover;
+  background-position: center;
+}
+
+/* ---------- Encabezado ---------- */
+
+.encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 0.9rem;
+  padding: 0.8rem 1rem;
+  background-color: var(--noche-honda);
+  background-image: var(--img-encabezado);
+  background-size: cover;
+  border-bottom: 1px solid var(--borde);
+}
+
+.encabezado .boton {
+  flex: 0 0 auto;
+  padding-inline: 0.8rem;
+  font-size: 0.875rem;
+}
+
+.encabezado__titulos {
+  order: -1;
+  flex: 1 0 100%;
+  min-width: 0;
+}
+
+.encabezado__tipo {
+  color: var(--laton);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.encabezado__titulo {
+  font: 700 1.6rem/1.15 var(--fuente-titulo);
+  overflow-wrap: anywhere;
+}
+
+#btn-logout {
+  margin-left: auto;
+}
+
+/* ---------- Datos ---------- */
+
+.datos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.panel__cuerpo--datos {
+  padding-top: 0.35rem;
+  padding-bottom: 0.7rem;
+}
+
+.datos__lista {
+  display: flex;
+  flex-direction: column;
+}
+
+.dato {
+  display: grid;
+  grid-template-columns: minmax(7rem, 42%) minmax(0, 1fr);
+  gap: 0.75rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid rgba(93, 129, 150, 0.35);
+}
+
+.dato:last-child {
+  border-bottom: 0;
+}
+
+.dato dt {
+  color: var(--texto-suave);
+}
+
+.dato dd {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.dato__vacio {
+  color: var(--texto-suave);
+  font-weight: 400;
+}
+
+/* ---------- Datos crudos ---------- */
+
+.crudo {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+}
+
+.crudo summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--alto-toque);
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.crudo pre {
+  max-height: 24rem;
+  margin: 0.5rem 0 0;
+  padding: 1rem;
+  overflow: auto;
+  background-color: var(--noche-honda);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-chico);
+  font: 0.8125rem/1.5 ui-monospace, 'Cascadia Code', Consolas, monospace;
+}
+
+/* ---------- Escritorio ---------- */
+
+@media (min-width: 800px) {
+  .encabezado {
+    flex-wrap: nowrap;
+    padding: 0.9rem clamp(1rem, 3vw, 2rem);
+  }
+
+  .encabezado .boton {
+    font-size: 1rem;
+  }
+
+  .encabezado__titulos {
+    order: 0;
+    flex: 1 1 auto;
+  }
+
+  .datos {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 1.25rem;
+    padding: 1.25rem clamp(1rem, 3vw, 2rem);
+  }
+}

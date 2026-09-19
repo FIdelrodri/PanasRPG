@@ -43,6 +43,19 @@ app.use((req, res, next) => {
   return next();
 });
 
+// -------------------- API DEL JUEGO --------------------
+// Menú, equipo, mundos, bosses y preparación de batalla (ver Metodos/api.js).
+// Responde JSON y 401 si no hay sesión (las vistas protegidas, en cambio,
+// redirigen al login).
+function requireLoginApi(req, res, next) {
+  if (req.session && req.session.userId) {
+    return next();
+  }
+  return res.status(401).json({ ok: false, error: 'No autenticado' });
+}
+
+app.use('/api', requireLoginApi, require('./PanasRPG/Metodos/api'));
+
 // Servir todos los archivos estáticos de la carpeta (HTML, CSS, JS, imágenes)
 // Se registra DESPUÉS del chequeo de rutas protegidas de arriba, para que
 // ese chequeo pueda cortar el acceso antes de que express.static entregue
