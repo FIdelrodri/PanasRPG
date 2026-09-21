@@ -8,7 +8,7 @@
 }
 
 .vista-menu {
-  background-image: var(--img-fondo-menu);
+  background-image: url("../../../../../PanasRPG/imagenes/Fondos/Main_menu.jpg");
   background-size: cover;
   background-position: center;
   padding-bottom: calc(4.25rem + env(safe-area-inset-bottom, 0px));
