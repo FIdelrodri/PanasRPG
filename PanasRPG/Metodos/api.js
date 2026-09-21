@@ -9,8 +9,9 @@
  *   GET    /api/mundos/:worldId/enemigos enemigos de un mundo
  *   GET    /api/bosses                   todos los bosses con su estado
  *   POST   /api/combate/iniciar          arma el paquete de batalla
- *   GET    /api/combate/actual           devuelve el paquete guardado en sesión
- *   DELETE /api/combate/actual           descarta el paquete (volver al menú)
+ *   POST   /api/combate/resolver         simula la pelea, da recompensas y actualiza la cuenta
+ *   GET    /api/combate/actual           paquete y/o resultado guardados en la sesión
+ *   DELETE /api/combate/actual           descarta paquete y resultado (volver al menú)
  */
 
 const express = require('express');
@@ -68,6 +69,7 @@ router.get('/menu', ruta(async (req, res) => {
       username: usuario.username,
       level: usuario.level,
       xp: usuario.xp,
+      gold: usuario.gold || 0,
       xpToNext: usuario.level >= nivelMax ? null : combate.xpParaSubir(usuario.level, cfg),
       maxLevel: nivelMax,
     },
@@ -290,6 +292,7 @@ router.post('/combate/iniciar', ruta(async (req, res) => {
   }
 
   req.session.combate = paquete;
+  delete req.session.resultado; // una pelea nueva descarta el resultado anterior
   req.session.save((err) => {
     if (err) {
       console.error('Error guardando la sesión:', err);
@@ -299,14 +302,140 @@ router.post('/combate/iniciar', ruta(async (req, res) => {
   });
 }));
 
+// Peleas ya resueltas (o resolviéndose) en este proceso. Evita que un doble
+// clic o dos pestañas cobren la misma pelea dos veces. Es memoria del proceso:
+// si algún día hay varios procesos del servidor, hay que pasarlo a la base.
+const combatesResueltos = new Set();
+
+function recordarResuelto(id) {
+  combatesResueltos.add(id);
+  if (combatesResueltos.size > 5000) {
+    combatesResueltos.delete(combatesResueltos.values().next().value);
+  }
+}
+
+router.post('/combate/resolver', ruta(async (req, res) => {
+  const db = getDB();
+  const usuario = await cargarUsuario(req);
+  if (!usuario) return res.status(401).json({ ok: false, error: 'Sesión inválida' });
+
+  const paquete = req.session.combate;
+  if (!paquete) {
+    // Ya estaba resuelta: se devuelve el mismo resultado, sin volver a pagar.
+    if (req.session.resultado) return res.json({ ok: true, resultado: req.session.resultado });
+    return res.status(404).json({ ok: false, error: 'No hay una batalla preparada' });
+  }
+  if (combatesResueltos.has(paquete.id)) {
+    return res.status(409).json({ ok: false, error: 'Esta pelea ya se está resolviendo' });
+  }
+
+  const falta = combate.faltantes(paquete);
+  if (falta.length) {
+    return res.status(409).json({ ok: false, error: 'Faltan datos para la batalla', faltantes: falta });
+  }
+
+  recordarResuelto(paquete.id); // síncrono: nadie más puede resolver esta pelea
+  let resultado;
+
+  try {
+    const cfg = await cargarConfig();
+    const sim = combate.simularCombate(paquete, { cfg });
+    const esBoss = paquete.objetivo.kind === 'boss';
+    const repetido = esBoss && (usuario.defeatedBosses || []).includes(paquete.objetivo.id);
+
+    const rec = sim.victoria ? combate.calcularRecompensas(paquete, { repetido }) : combate.SIN_RECOMPENSAS();
+    const prog = sim.victoria
+      ? combate.aplicarXp(usuario.level, usuario.xp, rec.xp, cfg)
+      : { nivel: usuario.level, xp: usuario.xp, subidos: 0 };
+
+    // ---- Actualización de la cuenta (una sola operación) ----
+    // El filtro comprueba que la cuenta no cambió mientras tanto (nivel/xp) y
+    // que las pociones siguen existiendo; si no, no se toca nada.
+    const filtro = { _id: usuario._id, level: usuario.level, xp: usuario.xp };
+    const inc = {};
+    const set = {};
+    const update = {};
+
+    for (const p of paquete.equipo.pociones) {
+      filtro[`ownedPotions.${p.potionId}`] = { $gte: 1 };
+      inc[`ownedPotions.${p.potionId}`] = -1; // se gastan ganes o pierdas
+    }
+    if (sim.victoria) {
+      if (rec.oro) inc.gold = rec.oro;
+      for (const d of rec.drops) {
+        inc[`materials.${d.materialId}`] = (inc[`materials.${d.materialId}`] || 0) + d.cantidad;
+      }
+      set.level = prog.nivel;
+      set.xp = prog.xp;
+      if (esBoss && !repetido) update.$addToSet = { defeatedBosses: paquete.objetivo.id };
+    }
+    if (Object.keys(inc).length) update.$inc = inc;
+    if (Object.keys(set).length) update.$set = set;
+
+    if (Object.keys(update).length) {
+      const r = await db.collection('usuarios').updateOne(filtro, update);
+      if (!r.matchedCount) {
+        combatesResueltos.delete(paquete.id);
+        return res.status(409).json({
+          ok: false,
+          error: 'Tu cuenta cambió mientras peleabas. Volvé al menú y probá de nuevo.',
+        });
+      }
+    }
+
+    const nivelMax = combate.nivelMaximo(cfg);
+    resultado = {
+      resueltoEn: new Date().toISOString(),
+      victoria: sim.victoria,
+      ganador: sim.ganador,
+      motivo: sim.motivo,
+      rondas: sim.rondas,
+      preparacion: sim.preparacion,
+      resumen: sim.resumen,
+      log: sim.log,
+      recompensas: {
+        ...rec,
+        nivelAntes: usuario.level,
+        nivelDespues: prog.nivel,
+        subioNivel: prog.subidos > 0,
+        nivelesSubidos: prog.subidos,
+        xpAntes: usuario.xp,
+        xpDespues: prog.xp,
+        xpParaSubir: prog.nivel >= nivelMax ? null : combate.xpParaSubir(prog.nivel, cfg),
+        oroTotal: (usuario.gold || 0) + rec.oro,
+        primeraVezBoss: esBoss ? !repetido : null,
+      },
+      pocionesGastadas: paquete.equipo.pociones.map((p) => ({ potionId: p.potionId, name: p.name })),
+      paquete,
+    };
+  } catch (err) {
+    combatesResueltos.delete(paquete.id);
+    throw err;
+  }
+
+  req.session.resultado = resultado;
+  delete req.session.combate;
+  req.session.save((err) => {
+    if (err) console.error('Error guardando la sesión:', err);
+    // La cuenta ya se actualizó: se devuelve el resultado aunque falle guardar la sesión.
+    res.json({ ok: true, resultado });
+  });
+}));
+
 router.get('/combate/actual', (req, res) => {
-  const paquete = req.session && req.session.combate;
-  if (!paquete) return res.status(404).json({ ok: false, error: 'No hay una batalla preparada' });
-  res.json({ ok: true, paquete });
+  const combatePendiente = req.session && req.session.combate;
+  const resultado = (req.session && req.session.resultado) || null;
+  if (!combatePendiente && !resultado) {
+    return res.status(404).json({ ok: false, error: 'No hay una batalla preparada' });
+  }
+  res.json({ ok: true, paquete: combatePendiente || resultado.paquete, resultado });
 });
 
 router.delete('/combate/actual', (req, res) => {
-  if (req.session) delete req.session.combate;
+  if (req.session) {
+    delete req.session.combate;
+    delete req.session.resultado;
+  }
   res.json({ ok: true });
 });
 

@@ -119,6 +119,7 @@
 
     $('cuenta-nombre').textContent = u.username;
     $('cuenta-nivel').textContent = u.level;
+    $('cuenta-oro').textContent = `Oro: ${numero(u.gold || 0)}`;
 
     const maximo = u.xpToNext == null;
     const porcentaje = maximo ? 100 : Math.max(0, Math.min(100, (u.xp / u.xpToNext) * 100));
@@ -669,6 +670,13 @@
       aviso('No se pudo cargar el menú. Probá recargar la página.', 'error');
     });
   }
+
+  // Si se vuelve con el botón "atrás" del navegador, la página puede venir de
+  // la memoria con datos viejos: se vuelven a pedir (XP, oro, items, bosses).
+  window.addEventListener('pageshow', (evento) => {
+    if (!evento.persisted) return;
+    Promise.all([cargarMenu(), cargarBosses()]).catch((error) => console.error(error));
+  });
 
   document.addEventListener('DOMContentLoaded', iniciar);
 })();

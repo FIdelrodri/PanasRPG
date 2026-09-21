@@ -50,6 +50,132 @@
   margin-left: auto;
 }
 
+/* ---------- Acción principal ---------- */
+
+.accion {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1rem 1rem 0;
+}
+
+.accion:empty {
+  display: none;
+}
+
+.boton--grande {
+  min-height: 3.25rem;
+  padding: 0.5rem 2rem;
+  font-size: 1.125rem;
+}
+
+.accion__nota {
+  color: var(--texto-suave);
+  font-size: 0.875rem;
+}
+
+/* ---------- Resultado ---------- */
+
+.resultado {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.titular {
+  padding: 1rem 1.25rem;
+  background-color: var(--placa);
+  border: 1px solid var(--borde);
+  border-left: 6px solid var(--musgo);
+  border-radius: var(--radio-chico);
+}
+
+.titular--derrota {
+  border-left-color: var(--sangre);
+}
+
+.titular__texto {
+  font: 700 1.9rem/1.15 var(--fuente-titulo);
+}
+
+.titular--victoria .titular__texto {
+  color: var(--musgo);
+}
+
+.titular--derrota .titular__texto {
+  color: var(--sangre);
+}
+
+.titular__detalle {
+  margin-top: 0.2rem;
+  color: var(--texto);
+}
+
+.titular__subida {
+  margin-top: 0.6rem;
+  color: var(--laton);
+  font: 700 1.1875rem/1.3 var(--fuente-titulo);
+}
+
+.panel--subida {
+  border-top-color: var(--musgo);
+}
+
+.datos__encabezado {
+  grid-column: 1 / -1;
+  padding-top: 0.5rem;
+  font: 700 1.3rem/1.2 var(--fuente-titulo);
+}
+
+/* ---------- Registro de turnos ---------- */
+
+.tabla-scroll {
+  max-height: 26rem;
+  overflow: auto;
+}
+
+.tabla-log {
+  width: 100%;
+  min-width: 34rem;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.tabla-log th,
+.tabla-log td {
+  padding: 0.4rem 0.8rem;
+  border-bottom: 1px solid rgba(93, 129, 150, 0.35);
+  text-align: left;
+}
+
+.tabla-log th {
+  position: sticky;
+  top: 0;
+  background-color: var(--placa-alta);
+  font-weight: 600;
+}
+
+.tabla-log .num {
+  text-align: right;
+}
+
+.log__jugador td:nth-child(2) {
+  color: var(--musgo);
+  font-weight: 600;
+}
+
+.log__rival td:nth-child(2) {
+  color: var(--sangre);
+  font-weight: 600;
+}
+
 /* ---------- Datos ---------- */
 
 .datos {
@@ -141,10 +267,20 @@
     flex: 1 1 auto;
   }
 
-  .datos {
+  .accion {
+    padding: 1.25rem clamp(1rem, 3vw, 2rem) 0;
+  }
+
+  .datos,
+  .resultado {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
     gap: 1.25rem;
     padding: 1.25rem clamp(1rem, 3vw, 2rem);
+  }
+
+  .titular,
+  .panel--ancho {
+    grid-column: 1 / -1;
   }
 }

@@ -11,7 +11,15 @@
  * cuenta de daño use las mismas palabras que sistema_completo.json.
  */
 
+const crypto = require('crypto');
+
 const MAX_POCIONES = 3;
+
+// Constantes de combate (sistema_completo.json → combat / player).
+const CRIT_MULT_DEFECTO = 1.75; // combat.critMultiplier
+const TOPE_CRIT = 0.35; // player.stats.crit: min(0.35, ...)
+const TOPE_ESQUIVA = 0.3; // player.stats.dodge: min(0.30, ...)
+const MAX_RONDAS = 300; // si se llega, la pelea cuenta como derrota
 
 const redondear = (n, decimales = 2) => {
   const f = 10 ** decimales;
@@ -192,13 +200,14 @@ function construirPaquete(datos) {
       usingSpecialWeapon: Boolean(arma && objetivo.specialWeaponId === arma.weaponId),
       rewards: {
         xp: objetivo.progressionRank * (px.bossMultiplier ?? 15 * 25),
-        gold: null,
-        drops: [],
+        gold: oroBoss(objetivo, px),
+        drops: [], // los bosses no dan loot
       },
     };
   }
 
   return {
+    id: crypto.randomUUID(), // identifica esta pelea para que no se resuelva dos veces
     creadoEn: new Date().toISOString(),
     meta: { version: 1, camposElementales: camposElementales(kind) },
     jugador: {
@@ -232,6 +241,238 @@ function construirPaquete(datos) {
   };
 }
 
+// ---------------------------------------------------------------------
+// Oro de los bosses. El JSON no lo trae: se toma la escala del oro de los
+// enemigos (de rango/2 a rango×2) multiplicada por lo mismo que la XP del
+// boss respecto a la del enemigo (×25). Si algún día el boss trae
+// loot.goldMin / loot.goldMax en el JSON, se usa eso.
+// ---------------------------------------------------------------------
+function oroBoss(boss, px) {
+  const loot = boss.loot || {};
+  if (loot.goldMin != null && loot.goldMax != null) return { min: loot.goldMin, max: loot.goldMax };
+  const factor = (px.bossMultiplier ?? 15 * 25) / (px.enemyMultiplier ?? 15);
+  return {
+    min: Math.round(boss.progressionRank * 0.5 * factor),
+    max: Math.round(boss.progressionRank * 2 * factor),
+  };
+}
+
+// ---------------------------------------------------------------------
+// SIMULACIÓN DE LA PELEA
+//
+// 1) Las pociones se aplican a las stats del jugador (multiplicativas; los
+//    topes de crítico y esquiva valen después de las pociones).
+// 2) Se turnan los ataques, el jugador primero, hasta que uno llega a 0 de
+//    vida o se alcanzan MAX_RONDAS (derrota).
+//
+// Daño del jugador  = ataque × poder del arma × (debilidad/resistencia/arma especial)
+// Daño del rival    = ataque × 100 / (100 + protección × efectividad de la armadura)
+// Cada golpe: primero esquiva del defensor, después crítico (×critMultiplier);
+// el daño es entero con mínimo 1.
+//
+// opciones.rng permite pasar un generador propio (para pruebas).
+// ---------------------------------------------------------------------
+const comoLista = (x) => (Array.isArray(x) ? x : x ? [x] : []);
+const enteroAlAzar = (min, max, rng) => min + Math.floor(rng() * (max - min + 1));
+
+function aplicarPociones(stats, pociones) {
+  const factores = { hp: 1, attack: 1, crit: 1, dodge: 1 };
+  for (const p of pociones || []) {
+    if (p.stat === 'all') {
+      for (const k of Object.keys(factores)) factores[k] *= p.multiplier;
+    } else if (p.stat in factores) {
+      factores[p.stat] *= p.multiplier;
+    }
+  }
+  return {
+    factores,
+    stats: {
+      hp: Math.max(1, Math.round(stats.hp * factores.hp)),
+      attack: stats.attack * factores.attack,
+      crit: Math.min(TOPE_CRIT, stats.crit * factores.crit),
+      dodge: Math.min(TOPE_ESQUIVA, stats.dodge * factores.dodge),
+    },
+  };
+}
+
+// Multiplicador del daño del jugador contra el objetivo.
+function multiplicadorContraObjetivo(objetivo, arma) {
+  let multiplicador = 1;
+  const detalle = [];
+
+  if (arma) {
+    for (const d of comoLista(objetivo.weakness)) {
+      if (d.weaponType === arma.type) {
+        multiplicador *= d.multiplier;
+        detalle.push({ tipo: 'debilidad', weaponType: d.weaponType, multiplier: d.multiplier });
+      }
+    }
+    for (const r of comoLista(objetivo.resistance)) {
+      if (r.weaponType === arma.type) {
+        multiplicador *= r.multiplier;
+        detalle.push({ tipo: 'resistencia', weaponType: r.weaponType, multiplier: r.multiplier });
+      }
+    }
+  }
+  if (objetivo.usingSpecialWeapon && objetivo.specialWeapon) {
+    multiplicador *= objetivo.specialWeapon.multiplier;
+    detalle.push({
+      tipo: 'arma_especial',
+      weaponId: objetivo.specialWeapon.weaponId,
+      multiplier: objetivo.specialWeapon.multiplier,
+    });
+  }
+  return { multiplicador, detalle };
+}
+
+function simularCombate(paquete, opciones = {}) {
+  const rng = opciones.rng || Math.random;
+  const cfg = opciones.cfg || null;
+  const critMult = (cfg && cfg.combat && cfg.combat.critMultiplier) || CRIT_MULT_DEFECTO;
+
+  const { jugador, equipo, objetivo } = paquete;
+  const { factores, stats: yo } = aplicarPociones(jugador.stats, equipo.pociones);
+  const rival = {
+    hp: objetivo.stats.hp,
+    attack: objetivo.stats.attack,
+    crit: objetivo.stats.crit ?? 0, // los bosses no tienen crítico ni esquiva
+    dodge: objetivo.stats.dodge ?? 0,
+  };
+
+  const arma = equipo.arma;
+  const armadura = equipo.armadura;
+  const poder = arma ? arma.basePowerMultiplier : 1;
+  const { multiplicador, detalle } = multiplicadorContraObjetivo(objetivo, arma);
+  const armaduraEfectiva = armadura ? armadura.protection * (objetivo.armorEffectiveness ?? 1) : 0;
+  const factorArmadura = 100 / (100 + armaduraEfectiva);
+
+  const danioBaseJugador = yo.attack * poder * multiplicador;
+  const danioBaseRival = rival.attack * factorArmadura;
+
+  function golpe(base, atacante, defensor) {
+    if (rng() < defensor.dodge) return { esquivado: true, critico: false, danio: 0 };
+    const critico = rng() < atacante.crit;
+    return { esquivado: false, critico, danio: Math.max(1, Math.round(base * (critico ? critMult : 1))) };
+  }
+
+  const resumen = {
+    jugador: { hpInicial: yo.hp, hpFinal: yo.hp, danioHecho: 0, danioRecibido: 0, criticos: 0, esquivas: 0 },
+    objetivo: { hpInicial: rival.hp, hpFinal: rival.hp, danioHecho: 0, danioRecibido: 0, criticos: 0, esquivas: 0 },
+  };
+  const log = [];
+  let hpJugador = yo.hp;
+  let hpRival = rival.hp;
+  let ganador = null;
+  let rondas = 0;
+
+  function registrar(actor, g) {
+    const atacante = resumen[actor];
+    const defensor = resumen[actor === 'jugador' ? 'objetivo' : 'jugador'];
+    atacante.danioHecho += g.danio;
+    defensor.danioRecibido += g.danio;
+    if (g.critico) atacante.criticos += 1;
+    if (g.esquivado) defensor.esquivas += 1;
+    log.push({ ronda: rondas, actor, ...g, jugadorHp: hpJugador, objetivoHp: hpRival });
+  }
+
+  while (rondas < MAX_RONDAS && !ganador) {
+    rondas += 1;
+
+    const g1 = golpe(danioBaseJugador, yo, rival);
+    hpRival = Math.max(0, hpRival - g1.danio);
+    registrar('jugador', g1);
+    if (hpRival <= 0) {
+      ganador = 'jugador';
+      break;
+    }
+
+    const g2 = golpe(danioBaseRival, rival, yo);
+    hpJugador = Math.max(0, hpJugador - g2.danio);
+    registrar('objetivo', g2);
+    if (hpJugador <= 0) ganador = 'objetivo';
+  }
+
+  resumen.jugador.hpFinal = hpJugador;
+  resumen.objetivo.hpFinal = hpRival;
+
+  return {
+    victoria: ganador === 'jugador',
+    ganador, // 'jugador' | 'objetivo' | null (se agotaron las rondas)
+    motivo: ganador ? 'vida' : 'limite_rondas',
+    rondas,
+    preparacion: {
+      jugadorBase: { ...jugador.stats },
+      jugadorConPociones: {
+        hp: yo.hp,
+        attack: redondear(yo.attack),
+        crit: redondear(yo.crit, 4),
+        dodge: redondear(yo.dodge, 4),
+      },
+      factoresPociones: factores,
+      pociones: equipo.pociones.map((p) => ({ potionId: p.potionId, name: p.name, stat: p.stat, multiplier: p.multiplier })),
+      objetivo: { ...rival },
+      poderArma: poder,
+      multiplicadorContraObjetivo: redondear(multiplicador, 4),
+      detalleMultiplicador: detalle,
+      armaduraEfectiva: redondear(armaduraEfectiva),
+      factorArmadura: redondear(factorArmadura, 4),
+      danioBaseJugador: redondear(danioBaseJugador),
+      danioBaseObjetivo: redondear(danioBaseRival),
+      multiplicadorCritico: critMult,
+      maxRondas: MAX_RONDAS,
+    },
+    resumen,
+    log,
+  };
+}
+
+// ---------------------------------------------------------------------
+// RECOMPENSAS (solo si se gana)
+// - XP: la del paquete (enemigo: rango×15; boss: rango×15×25).
+// - Oro: entero al azar entre min y max.
+// - Loot: cada drop se tira por separado con su chance; cantidad al azar
+//   entre min y max. Los bosses no dan loot.
+// - Boss ya derrotado antes (repetido): la mitad de XP y oro.
+// ---------------------------------------------------------------------
+function calcularRecompensas(paquete, { rng = Math.random, repetido = false } = {}) {
+  const r = paquete.objetivo.rewards || {};
+  const mitad = (n) => (repetido ? Math.round(n / 2) : n);
+
+  const drops = [];
+  for (const d of r.drops || []) {
+    if (rng() < d.chance) {
+      drops.push({ materialId: d.materialId, name: d.name, cantidad: enteroAlAzar(d.min, d.max, rng) });
+    }
+  }
+
+  return {
+    xp: mitad(r.xp || 0),
+    oro: r.gold ? mitad(enteroAlAzar(r.gold.min, r.gold.max, rng)) : 0,
+    drops,
+    mitad: repetido,
+  };
+}
+
+const SIN_RECOMPENSAS = () => ({ xp: 0, oro: 0, drops: [], mitad: false });
+
+// Suma XP y sube de nivel las veces que haga falta. La barra se reinicia en
+// cada subida y el sobrante queda. En el nivel máximo no se acumula XP.
+function aplicarXp(nivel, xp, ganada, cfg) {
+  const max = nivelMaximo(cfg);
+  let n = nivel;
+  let x = xp + ganada;
+  let subidos = 0;
+
+  while (n < max && x >= xpParaSubir(n, cfg)) {
+    x -= xpParaSubir(n, cfg);
+    n += 1;
+    subidos += 1;
+  }
+  if (n >= max) x = 0;
+
+  return { nivel: n, xp: x, subidos };
+}
+
 module.exports = {
   MAX_POCIONES,
   statsJugador,
@@ -242,4 +483,9 @@ module.exports = {
   camposElementales,
   faltantes,
   construirPaquete,
+  simularCombate,
+  calcularRecompensas,
+  aplicarXp,
+  SIN_RECOMPENSAS,
+  MAX_RONDAS,
 };

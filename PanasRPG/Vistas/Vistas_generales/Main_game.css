@@ -8,7 +8,7 @@
 }
 
 .vista-menu {
-  background-image: url("../../../../../PanasRPG/imagenes/Fondos/Main_menu.jpg");
+  background-image: var(--img-fondo-menu);
   background-size: cover;
   background-position: center;
   padding-bottom: calc(4.25rem + env(safe-area-inset-bottom, 0px));
@@ -86,6 +86,12 @@
   height: 100%;
   background-color: var(--musgo);
   transition: width 0.5s;
+}
+
+.cuenta__oro {
+  color: var(--laton);
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
 .xp__texto {

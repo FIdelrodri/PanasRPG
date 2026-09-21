@@ -18,7 +18,14 @@
     <button type="button" class="boton boton--sutil" id="btn-logout">Cerrar sesión</button>
   </header>
 
-  <main class="datos" id="datos" aria-live="polite"></main>
+  <!-- Botón principal: "Comenzar pelea" antes de pelear, "Volver al menú" después -->
+  <section class="accion" id="accion" aria-live="polite"></section>
+
+  <!-- Resultado de la pelea (se llena al terminar) -->
+  <section class="resultado" id="resultado" aria-label="Resultado de la pelea" hidden></section>
+
+  <!-- Datos con los que se pelea -->
+  <main class="datos" id="datos"></main>
 
   <section class="crudo">
     <details>
