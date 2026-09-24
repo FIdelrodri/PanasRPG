@@ -57,7 +57,7 @@
       <div class="lista-scroll lista-scroll--inventario" id="inventario"><p class="vacio">Cargando…</p></div>
     </section>
 
-    <!-- ===== Combate: Mundos, Bosses, Mercado ===== -->
+    <!-- ===== Combate: Mundos, Bosses, Mercado, Crafteo ===== -->
     <section class="panel seccion seccion--combate" data-seccion="combate" aria-labelledby="t-combate">
       <div class="panel__cabecera">
         <h2 class="panel__titulo" id="t-combate">Combate</h2>
@@ -69,8 +69,9 @@
         <button type="button" class="pestana" role="tab" id="tab-bosses" data-tab="bosses"
                 aria-selected="false" aria-controls="panel-bosses">Bosses</button>
         <button type="button" class="pestana" role="tab" id="tab-mercado" data-tab="mercado"
-                aria-selected="false" aria-controls="panel-mercado"
-                disabled title="Próximamente">Mercado</button>
+                aria-selected="false" aria-controls="panel-mercado">Mercado</button>
+        <button type="button" class="pestana" role="tab" id="tab-crafteo" data-tab="crafteo"
+                aria-selected="false" aria-controls="panel-crafteo">Crafteo</button>
       </div>
 
       <div id="panel-mundos" role="tabpanel" aria-labelledby="tab-mundos">
@@ -83,7 +84,20 @@
       </div>
 
       <div id="panel-mercado" role="tabpanel" aria-labelledby="tab-mercado" hidden>
-        <p class="vacio">El mercado todavía no está disponible.</p>
+        <div class="mercado__cabecera">
+          <p class="panel__nota">Comprá objetos y materiales con oro.</p>
+          <button type="button" class="boton" id="mercado-renovar">Renovar por 50 oro</button>
+        </div>
+        <div class="mercado" id="mercado"><p class="vacio">Cargando mercado…</p></div>
+      </div>
+
+      <div id="panel-crafteo" role="tabpanel" aria-labelledby="tab-crafteo" hidden>
+        <label class="buscador" for="crafteo-busqueda">
+          <span class="buscador__icono" aria-hidden="true">⌕</span>
+          <span class="sr-only">Buscar recetas</span>
+          <input id="crafteo-busqueda" type="search" placeholder="Buscar recetas por nombre">
+        </label>
+        <div class="lista-scroll lista-scroll--crafteo" id="crafteo"><p class="vacio">Cargando recetas…</p></div>
       </div>
     </section>
 

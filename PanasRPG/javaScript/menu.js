@@ -42,6 +42,9 @@
     mundoActivo: null,
     enemigos: {}, // cache: worldId -> lista
     bosses: [],
+    mercado: [],
+    recetas: [],
+    filtroRecetas: '',
     filtroInv: 'todo',
     ordenInv: 'categoria',
   };
@@ -554,6 +557,7 @@
       return;
     }
 
+
     cont.append(
       el(
         'ul',
@@ -594,6 +598,169 @@
   }
 
   // ---------------------------------------------------------- pestañas y móvil
+
+
+  // ---------------------------------------------------------- mercado
+
+  function renderMercado() {
+    const cont = $('mercado');
+    vaciar(cont);
+    if (!estado.mercado.length) {
+    cont.append(el('p', { class: 'vacio' }, 'El mercado no tiene objetos disponibles.'));
+    return;
+    }
+    for (const nivel of estado.mercado) {
+    const items = nivel.items || [];
+    cont.append(
+      el(
+      'section',
+      { class: 'mercado__nivel' },
+      el(
+        'h3',
+        { class: 'mercado__titulo' },
+        nivel.nombre,
+        el('span', { class: 'mercado__precio' }, `${numero(nivel.precio)} oro`)
+      ),
+      el(
+        'div',
+        { class: 'mercado__items' },
+        items.map((item) =>
+        el(
+          'article',
+          { class: 'mercado__item' },
+          el('span', { class: 'mercado__item-nombre' }, item.name),
+          el('span', { class: 'mercado__item-detalle' }, item.details),
+          el(
+          'button',
+          {
+            type: 'button',
+            class: 'boton',
+            disabled: item.owned,
+            onclick: (evento) => comprarMercado(item.slotId, evento.currentTarget),
+          },
+          item.owned ? 'Adquirido' : `Comprar · ${numero(item.price)}`
+          )
+        )
+        )
+      )
+      )
+    );
+    }
+  }
+
+  async function cargarMercado() {
+    const datos = await api('/api/mercado');
+    if (estado.usuario) estado.usuario.gold = datos.gold;
+    estado.mercado = datos.tiers;
+    renderCuenta();
+    renderMercado();
+  }
+
+  async function comprarMercado(slotId, boton) {
+    boton.disabled = true;
+    try {
+    const datos = await api('/api/mercado/compra', {
+      method: 'POST',
+      body: JSON.stringify({ slotId }),
+    });
+    if (estado.usuario) estado.usuario.gold = datos.gold;
+    renderCuenta();
+    await cargarMenu();
+    await cargarMercado();
+    aviso('Compra realizada.');
+    } catch (error) {
+    aviso(error.message, 'error');
+    renderMercado();
+    }
+  }
+
+  async function renovarMercado() {
+    const boton = $('mercado-renovar');
+    boton.disabled = true;
+    try {
+    const datos = await api('/api/mercado/renovar', { method: 'POST' });
+    if (estado.usuario) estado.usuario.gold = datos.gold;
+    await cargarMercado();
+    renderCuenta();
+    aviso('Mercado renovado.');
+    } catch (error) {
+    aviso(error.message, 'error');
+    } finally {
+    boton.disabled = false;
+    }
+  }
+
+  // ---------------------------------------------------------- crafteo
+
+  function renderCrafteo() {
+    const cont = $('crafteo');
+    vaciar(cont);
+    const termino = estado.filtroRecetas.trim().toLocaleLowerCase('es');
+    const recetas = estado.recetas.filter((receta) => receta.outputName.toLocaleLowerCase('es').includes(termino));
+    if (!recetas.length) {
+    cont.append(el('p', { class: 'vacio' }, 'No hay recetas que coincidan.'));
+    return;
+    }
+    cont.append(
+    el(
+      'div',
+      { class: 'lista' },
+      recetas.map((receta) => {
+      const faltan = receta.ingredients.some((item) => item.available < item.quantity);
+      const bloqueada = receta.owned || faltan;
+      return el(
+        'article',
+        { class: 'receta' },
+        el(
+        'div',
+        { class: 'receta__cabecera' },
+        el('span', { class: 'receta__nombre' }, receta.outputName),
+        el('span', { class: 'fila__detalle' }, receta.owned ? 'Ya poseído' : `Receta ${receta.recipeId}`)
+        ),
+        el(
+        'div',
+        { class: 'receta__ingredientes' },
+        receta.ingredients.map((item) =>
+          el(
+          'span',
+          { class: `receta__ingrediente${item.available < item.quantity ? ' receta__ingrediente--falta' : ''}` },
+          `${item.name}: ${item.available}/${item.quantity}`
+          )
+        )
+        ),
+        el(
+        'button',
+        {
+          type: 'button',
+          class: 'boton',
+          disabled: bloqueada,
+          onclick: (evento) => fabricar(receta.recipeId, evento.currentTarget),
+        },
+        receta.owned ? 'Adquirido' : faltan ? 'Faltan materiales' : 'Fabricar'
+        )
+      );
+      })
+    )
+    );
+  }
+
+  async function cargarCrafteo() {
+    const datos = await api('/api/crafteo');
+    estado.recetas = datos.recipes;
+    renderCrafteo();
+  }
+
+  async function fabricar(recipeId, boton) {
+    boton.disabled = true;
+    try {
+    await api('/api/crafteo', { method: 'POST', body: JSON.stringify({ recipeId }) });
+    await Promise.all([cargarMenu(), cargarCrafteo()]);
+    aviso('Objeto fabricado.');
+    } catch (error) {
+    aviso(error.message, 'error');
+    await cargarCrafteo();
+    }
+  }
 
   function elegirPestana(nombre) {
     for (const boton of document.querySelectorAll('.pestana')) {
@@ -661,11 +828,16 @@
     for (const boton of document.querySelectorAll('[data-ir]')) {
       boton.addEventListener('click', () => irASeccion(boton.dataset.ir));
     }
+    $('mercado-renovar').addEventListener('click', renovarMercado);
+    $('crafteo-busqueda').addEventListener('input', (evento) => {
+      estado.filtroRecetas = evento.target.value;
+      renderCrafteo();
+    });
 
     irASeccion('combate');
     mostrarAvisoDeLaUrl();
 
-    Promise.all([cargarMenu(), cargarMundos(), cargarBosses()]).catch((error) => {
+    Promise.all([cargarMenu(), cargarMundos(), cargarBosses(), cargarMercado(), cargarCrafteo()]).catch((error) => {
       console.error(error);
       aviso('No se pudo cargar el menú. Probá recargar la página.', 'error');
     });
@@ -675,7 +847,7 @@
   // la memoria con datos viejos: se vuelven a pedir (XP, oro, items, bosses).
   window.addEventListener('pageshow', (evento) => {
     if (!evento.persisted) return;
-    Promise.all([cargarMenu(), cargarBosses()]).catch((error) => console.error(error));
+    Promise.all([cargarMenu(), cargarBosses(), cargarMercado(), cargarCrafteo()]).catch((error) => console.error(error));
   });
 
   document.addEventListener('DOMContentLoaded', iniciar);

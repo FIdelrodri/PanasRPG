@@ -188,6 +188,138 @@
   opacity: 0.55;
 }
 
+.mercado__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1.1rem;
+  border-bottom: 1px solid rgba(93, 129, 150, 0.35);
+}
+
+.mercado {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+}
+
+.mercado__titulo,
+.receta__cabecera {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.mercado__titulo {
+  margin-bottom: 0.5rem;
+  font: 700 1.0625rem/1.3 var(--fuente-titulo);
+}
+
+.mercado__precio {
+  color: var(--laton);
+  font: 600 0.875rem/1 var(--fuente-texto);
+}
+
+.mercado__items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.5rem;
+}
+
+.mercado__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.65rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-chico);
+  background: var(--placa-alta);
+}
+
+.mercado__item-nombre {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.mercado__item-detalle {
+  min-height: 2.2em;
+  color: var(--texto-suave);
+  font-size: 0.8125rem;
+}
+
+.mercado__item .boton {
+  margin-top: auto;
+}
+
+.buscador {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.8rem 1.1rem;
+  padding: 0 0.65rem;
+  border: 1px solid var(--borde-fuerte);
+  border-radius: var(--radio-chico);
+  background: var(--placa-alta);
+}
+
+.buscador__icono {
+  color: var(--laton);
+  font-size: 1.35rem;
+}
+
+.buscador input {
+  width: 100%;
+  min-height: 2.4rem;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--texto);
+  font: inherit;
+}
+
+.receta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.8rem 1.1rem;
+  border-bottom: 1px solid rgba(93, 129, 150, 0.35);
+}
+
+.receta__nombre {
+  font-weight: 700;
+}
+
+.receta__ingredientes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.receta__ingrediente {
+  padding: 0.25rem 0.45rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-chico);
+  color: var(--texto-suave);
+  font-size: 0.8125rem;
+}
+
+.receta__ingrediente--falta {
+  border-color: #9c4b4b;
+  color: #f0a1a1;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .filtros {
   display: flex;
   gap: 0.4rem;
@@ -391,6 +523,10 @@
 
   .lista-scroll--inventario {
     max-height: min(46vh, 26rem);
+  }
+
+  .lista-scroll--crafteo {
+    max-height: min(70vh, 44rem);
   }
 
   .nav-movil {
