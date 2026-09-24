@@ -606,52 +606,39 @@
     const cont = $('mercado');
     vaciar(cont);
     if (!estado.mercado.length) {
-    cont.append(el('p', { class: 'vacio' }, 'El mercado no tiene objetos disponibles.'));
-    return;
+      cont.append(el('p', { class: 'vacio' }, 'El mercado no tiene objetos disponibles.'));
+      return;
     }
-    for (const nivel of estado.mercado) {
-    const items = nivel.items || [];
     cont.append(
-      el(
-      'section',
-      { class: 'mercado__nivel' },
-      el(
-        'h3',
-        { class: 'mercado__titulo' },
-        nivel.nombre,
-        el('span', { class: 'mercado__precio' }, `${numero(nivel.precio)} oro`)
-      ),
       el(
         'div',
         { class: 'mercado__items' },
-        items.map((item) =>
-        el(
-          'article',
-          { class: 'mercado__item' },
-          el('span', { class: 'mercado__item-nombre' }, item.name),
-          el('span', { class: 'mercado__item-detalle' }, item.details),
+        estado.mercado.map((item) =>
           el(
-          'button',
-          {
-            type: 'button',
-            class: 'boton',
-            disabled: item.owned,
-            onclick: (evento) => comprarMercado(item.slotId, evento.currentTarget),
-          },
-          item.owned ? 'Adquirido' : `Comprar · ${numero(item.price)}`
+            'article',
+            { class: 'mercado__item' },
+            el('span', { class: 'mercado__item-nombre' }, item.name),
+            el('span', { class: 'mercado__item-detalle' }, `${item.rarityName} · ${item.details}`),
+            el(
+              'button',
+              {
+                type: 'button',
+                class: 'boton',
+                disabled: item.owned,
+                onclick: (evento) => comprarMercado(item.slotId, evento.currentTarget),
+              },
+              item.owned ? 'Adquirido' : `Comprar · ${numero(item.price)}`
+            )
           )
         )
-        )
-      )
       )
     );
-    }
   }
 
   async function cargarMercado() {
     const datos = await api('/api/mercado');
     if (estado.usuario) estado.usuario.gold = datos.gold;
-    estado.mercado = datos.tiers;
+    estado.mercado = datos.items;
     renderCuenta();
     renderMercado();
   }
