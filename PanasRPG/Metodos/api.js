@@ -8,6 +8,11 @@
  *   GET    /api/mundos                   lista de mundos
  *   GET    /api/mundos/:worldId/enemigos enemigos de un mundo
  *   GET    /api/bosses                   todos los bosses con su estado
+ *   GET    /api/mercado                  inventario persistido del mercado
+ *   POST   /api/mercado/compra           compra un objeto del mercado
+ *   POST   /api/mercado/renovar          renueva todos los niveles por 50 de oro
+ *   GET    /api/crafteo                  todas las recetas y materiales del usuario
+ *   POST   /api/crafteo                   fabrica una receta
  *   POST   /api/combate/iniciar          arma el paquete de batalla
  *   POST   /api/combate/resolver         simula la pelea, da recompensas y actualiza la cuenta
  *   GET    /api/combate/actual           paquete y/o resultado guardados en la sesión
@@ -42,6 +47,81 @@ async function cargarUsuario(req) {
 }
 
 const cargarConfig = () => getDB().collection('gameConfig').findOne({ _id: 'gameConfig' });
+
+const MERCADO_NIVELES = [
+  { id: 'comun', nombre: 'Común', precio: 50, min: 0, max: 1.1 },
+  { id: 'poco_comun', nombre: 'Poco común', precio: 150, min: 1.1, max: 1.2 },
+  { id: 'raro', nombre: 'Raro', precio: 400, min: 1.2, max: 1.35 },
+  { id: 'epico', nombre: 'Épico', precio: 900, min: 1.35, max: Infinity },
+];
+
+function nivelMercado(tipo, objeto) {
+  if (tipo === 'material' || tipo === 'potion') return MERCADO_NIVELES[0];
+  const poder = tipo === 'weapon' ? objeto.basePowerMultiplier : objeto.protection / 100;
+  return MERCADO_NIVELES.find((nivel) => poder >= nivel.min && poder < nivel.max)
+    || MERCADO_NIVELES[MERCADO_NIVELES.length - 1];
+}
+
+function construirMercado(definiciones) {
+  const porNivel = Object.fromEntries(MERCADO_NIVELES.map((nivel) => [nivel.id, []]));
+  for (const { tipo, objeto } of definiciones) {
+    const nivel = nivelMercado(tipo, objeto);
+    porNivel[nivel.id].push({ tipo, objeto, nivel });
+  }
+
+  const slots = [];
+  for (const nivel of MERCADO_NIVELES) {
+    const candidatos = porNivel[nivel.id];
+    for (let indice = 0; indice < 10; indice += 1) {
+      const elegido = candidatos.length ? candidatos[Math.floor(Math.random() * candidatos.length)] : null;
+      if (!elegido) continue;
+      const id = elegido.objeto[`${elegido.tipo}Id`] || elegido.objeto.materialId;
+      slots.push({
+        slotId: `${nivel.id}-${indice}`,
+        type: elegido.tipo,
+        itemId: id,
+        name: elegido.objeto.name,
+        price: nivel.precio,
+        rarity: nivel.id,
+        unique: elegido.tipo === 'weapon' || elegido.tipo === 'armor',
+        details:
+          elegido.tipo === 'weapon'
+            ? `${elegido.objeto.type}, poder ×${elegido.objeto.basePowerMultiplier}`
+            : elegido.tipo === 'armor'
+              ? `Protección ${elegido.objeto.protection}`
+              : elegido.tipo === 'potion'
+                ? `×${elegido.objeto.multiplier} ${elegido.objeto.stat}`
+                : 'Material de fabricación',
+      });
+    }
+  }
+  return slots;
+}
+
+async function definicionesMercado(db) {
+  const [weapons, armors, potions, materials, bosses] = await Promise.all([
+    db.collection('weapons').find({}, SIN_ID).toArray(),
+    db.collection('armors').find({}, SIN_ID).toArray(),
+    db.collection('potions').find({}, SIN_ID).toArray(),
+    db.collection('materials').find({}, SIN_ID).toArray(),
+    db.collection('bosses').find({}, SIN_ID).toArray(),
+  ]);
+  const especiales = new Set(bosses.map((boss) => boss.specialWeaponId).filter(Boolean));
+  return [
+    ...weapons.filter((weapon) => !especiales.has(weapon.weaponId)).map((objeto) => ({ tipo: 'weapon', objeto })),
+    ...armors.map((objeto) => ({ tipo: 'armor', objeto })),
+    ...potions.map((objeto) => ({ tipo: 'potion', objeto })),
+    ...materials.map((objeto) => ({ tipo: 'material', objeto })),
+  ];
+}
+
+function estadoMercado(slot, usuario) {
+  if (!slot.unique) return { ...slot, owned: false };
+  const owned = slot.type === 'weapon'
+    ? (usuario.ownedWeapons || []).includes(slot.itemId)
+    : (usuario.ownedArmors || []).includes(slot.itemId);
+  return { ...slot, owned };
+}
 
 // -------------------- MENÚ --------------------
 
@@ -207,6 +287,164 @@ router.get('/bosses', ruta(async (req, res) => {
   const usuario = await cargarUsuario(req);
   if (!usuario) return res.status(401).json({ ok: false, error: 'Sesión inválida' });
   res.json({ ok: true, bosses: await listarBosses(usuario) });
+}));
+
+// -------------------- MERCADO --------------------
+
+async function cargarMercado(usuario) {
+  if (Array.isArray(usuario.marketInventory) && usuario.marketInventory.length) {
+    return usuario.marketInventory;
+  }
+  const slots = construirMercado(await definicionesMercado(getDB()));
+  const resultado = await getDB().collection('usuarios').updateOne(
+    { _id: usuario._id, marketInventory: { $exists: false } },
+    { $set: { marketInventory: slots } }
+  );
+  if (resultado.matchedCount) return slots;
+  const guardado = await getDB().collection('usuarios').findOne({ _id: usuario._id }, { projection: { marketInventory: 1 } });
+  return guardado.marketInventory || slots;
+}
+
+router.get('/mercado', ruta(async (req, res) => {
+  const usuario = await cargarUsuario(req);
+  if (!usuario) return res.status(401).json({ ok: false, error: 'Sesión inválida' });
+  const slots = await cargarMercado(usuario);
+  res.json({
+    ok: true,
+    gold: usuario.gold || 0,
+    tiers: MERCADO_NIVELES.map((nivel) => ({
+      ...nivel,
+      items: slots.filter((slot) => slot.rarity === nivel.id).map((slot) => estadoMercado(slot, usuario)),
+    })),
+  });
+}));
+
+router.post('/mercado/renovar', ruta(async (req, res) => {
+  const usuario = await cargarUsuario(req);
+  if (!usuario) return res.status(401).json({ ok: false, error: 'Sesión inválida' });
+  if ((usuario.gold || 0) < 50) return res.status(400).json({ ok: false, error: 'No tenés suficiente oro para renovar' });
+  const slots = construirMercado(await definicionesMercado(getDB()));
+  const resultado = await getDB().collection('usuarios').findOneAndUpdate(
+    { _id: usuario._id, gold: { $gte: 50 } },
+    { $inc: { gold: -50 }, $set: { marketInventory: slots } },
+    { returnDocument: 'after', projection: { gold: 1, marketInventory: 1 } }
+  );
+  if (!resultado) return res.status(409).json({ ok: false, error: 'Tu oro cambió, volvé a intentar' });
+  res.json({ ok: true, gold: resultado.gold, renewed: true });
+}));
+
+router.post('/mercado/compra', ruta(async (req, res) => {
+  const db = getDB();
+  const usuario = await cargarUsuario(req);
+  if (!usuario) return res.status(401).json({ ok: false, error: 'Sesión inválida' });
+  const slotId = req.body && req.body.slotId;
+  if (!esTexto(slotId)) return res.status(400).json({ ok: false, error: 'Objeto de mercado inválido' });
+  const slots = await cargarMercado(usuario);
+  const slot = slots.find((item) => item.slotId === slotId);
+  if (!slot) return res.status(404).json({ ok: false, error: 'Ese objeto ya no está disponible' });
+  if (slot.unique && ((slot.type === 'weapon' && (usuario.ownedWeapons || []).includes(slot.itemId))
+    || (slot.type === 'armor' && (usuario.ownedArmors || []).includes(slot.itemId)))) {
+    return res.status(409).json({ ok: false, error: 'Ya tenés ese objeto' });
+  }
+
+  const filtro = { _id: usuario._id, gold: { $gte: slot.price } };
+  const update = { $inc: { gold: -slot.price } };
+  if (slot.type === 'weapon') {
+    filtro.ownedWeapons = { $nin: [slot.itemId] };
+    update.$addToSet = { ownedWeapons: slot.itemId };
+  } else if (slot.type === 'armor') {
+    filtro.ownedArmors = { $nin: [slot.itemId] };
+    update.$addToSet = { ownedArmors: slot.itemId };
+  } else if (slot.type === 'potion') {
+    update.$inc[`ownedPotions.${slot.itemId}`] = 1;
+  } else {
+    update.$inc[`materials.${slot.itemId}`] = 1;
+  }
+  const resultado = await db.collection('usuarios').findOneAndUpdate(
+    filtro,
+    update,
+    { returnDocument: 'after', projection: { gold: 1 } }
+  );
+  if (!resultado) return res.status(400).json({ ok: false, error: 'No tenés suficiente oro o ya poseés ese objeto' });
+  res.json({ ok: true, gold: resultado.gold, slotId });
+}));
+
+// -------------------- CRAFTEO --------------------
+
+router.get('/crafteo', ruta(async (req, res) => {
+  const db = getDB();
+  const usuario = await cargarUsuario(req);
+  if (!usuario) return res.status(401).json({ ok: false, error: 'Sesión inválida' });
+  const [recipes, materials, weapons, armors, potions] = await Promise.all([
+    db.collection('recipes').find({}, SIN_ID).toArray(),
+    db.collection('materials').find({}, SIN_ID).toArray(),
+    db.collection('weapons').find({}, SIN_ID).toArray(),
+    db.collection('armors').find({}, SIN_ID).toArray(),
+    db.collection('potions').find({}, SIN_ID).toArray(),
+  ]);
+  const nombres = Object.fromEntries(materials.map((item) => [item.materialId, item.name]));
+  const salidas = Object.fromEntries([
+    ...weapons.map((item) => [`weapon:${item.weaponId}`, item]),
+    ...armors.map((item) => [`armor:${item.armorId}`, item]),
+    ...potions.map((item) => [`potion:${item.potionId}`, item]),
+  ]);
+  const materialesUsuario = usuario.materials || {};
+  res.json({
+    ok: true,
+    materials: materials.map((item) => ({ materialId: item.materialId, name: item.name, quantity: materialesUsuario[item.materialId] || 0 })),
+    recipes: recipes.map((recipe) => {
+      const salida = salidas[`${recipe.output.type}:${recipe.output.id}`];
+      const owned = recipe.output.type === 'weapon'
+        ? (usuario.ownedWeapons || []).includes(recipe.output.id)
+        : recipe.output.type === 'armor'
+          ? (usuario.ownedArmors || []).includes(recipe.output.id)
+          : false;
+      return {
+        ...recipe,
+        outputName: salida ? salida.name : recipe.output.id,
+        ingredients: recipe.ingredients.map((ingredient) => ({
+          ...ingredient,
+          name: nombres[ingredient.materialId] || ingredient.materialId,
+          available: materialesUsuario[ingredient.materialId] || 0,
+        })),
+        owned,
+      };
+    }),
+  });
+}));
+
+router.post('/crafteo', ruta(async (req, res) => {
+  const db = getDB();
+  const usuario = await cargarUsuario(req);
+  if (!usuario) return res.status(401).json({ ok: false, error: 'Sesión inválida' });
+  const recipeId = req.body && req.body.recipeId;
+  if (!esTexto(recipeId)) return res.status(400).json({ ok: false, error: 'Receta inválida' });
+  const recipe = await db.collection('recipes').findOne({ recipeId }, SIN_ID);
+  if (!recipe) return res.status(404).json({ ok: false, error: 'Esa receta no existe' });
+  const filtro = { _id: usuario._id };
+  for (const ingredient of recipe.ingredients || []) {
+    filtro[`materials.${ingredient.materialId}`] = { $gte: ingredient.quantity };
+  }
+  const update = { $inc: {} };
+  for (const ingredient of recipe.ingredients || []) {
+    update.$inc[`materials.${ingredient.materialId}`] = -ingredient.quantity;
+  }
+  if (recipe.output.type === 'weapon') {
+    filtro.ownedWeapons = { $nin: [recipe.output.id] };
+    update.$addToSet = { ownedWeapons: recipe.output.id };
+  } else if (recipe.output.type === 'armor') {
+    filtro.ownedArmors = { $nin: [recipe.output.id] };
+    update.$addToSet = { ownedArmors: recipe.output.id };
+  } else if (recipe.output.type === 'potion') {
+    update.$inc[`ownedPotions.${recipe.output.id}`] = recipe.output.quantity;
+  } else {
+    return res.status(400).json({ ok: false, error: 'Salida de receta no soportada' });
+  }
+  const resultado = await db.collection('usuarios').updateOne(filtro, update);
+  if (!resultado.matchedCount) {
+    return res.status(400).json({ ok: false, error: 'Faltan materiales o ya tenés ese objeto' });
+  }
+  res.json({ ok: true, recipeId });
 }));
 
 // -------------------- COMBATE --------------------
