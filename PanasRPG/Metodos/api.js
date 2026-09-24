@@ -10,7 +10,7 @@
  *   GET    /api/bosses                   todos los bosses con su estado
  *   GET    /api/mercado                  inventario persistido del mercado
  *   POST   /api/mercado/compra           compra un objeto del mercado
- *   POST   /api/mercado/renovar          renueva todos los niveles por 50 de oro
+ *   POST   /api/mercado/renovar          renueva los 10 casilleros por 50 de oro
  *   GET    /api/crafteo                  todas las recetas y materiales del usuario
  *   POST   /api/crafteo                   fabrica una receta
  *   POST   /api/combate/iniciar          arma el paquete de batalla
@@ -49,10 +49,10 @@ async function cargarUsuario(req) {
 const cargarConfig = () => getDB().collection('gameConfig').findOne({ _id: 'gameConfig' });
 
 const MERCADO_NIVELES = [
-  { id: 'comun', nombre: 'Común', precio: 50, min: 0, max: 1.1 },
-  { id: 'poco_comun', nombre: 'Poco común', precio: 150, min: 1.1, max: 1.2 },
-  { id: 'raro', nombre: 'Raro', precio: 400, min: 1.2, max: 1.35 },
-  { id: 'epico', nombre: 'Épico', precio: 900, min: 1.35, max: Infinity },
+  { id: 'comun', nombre: 'Común', precio: 50, min: 0, max: 1.1, probabilidad: 0.5 },
+  { id: 'poco_comun', nombre: 'Poco común', precio: 150, min: 1.1, max: 1.2, probabilidad: 0.25 },
+  { id: 'raro', nombre: 'Raro', precio: 400, min: 1.2, max: 1.35, probabilidad: 0.17 },
+  { id: 'epico', nombre: 'Épico', precio: 900, min: 1.35, max: Infinity, probabilidad: 0.08 },
 ];
 
 function nivelMercado(tipo, objeto) {
@@ -70,30 +70,38 @@ function construirMercado(definiciones) {
   }
 
   const slots = [];
-  for (const nivel of MERCADO_NIVELES) {
-    const candidatos = porNivel[nivel.id];
-    for (let indice = 0; indice < 10; indice += 1) {
-      const elegido = candidatos.length ? candidatos[Math.floor(Math.random() * candidatos.length)] : null;
-      if (!elegido) continue;
-      const id = elegido.objeto[`${elegido.tipo}Id`] || elegido.objeto.materialId;
-      slots.push({
-        slotId: `${nivel.id}-${indice}`,
-        type: elegido.tipo,
-        itemId: id,
-        name: elegido.objeto.name,
-        price: nivel.precio,
-        rarity: nivel.id,
-        unique: elegido.tipo === 'weapon' || elegido.tipo === 'armor',
-        details:
-          elegido.tipo === 'weapon'
-            ? `${elegido.objeto.type}, poder ×${elegido.objeto.basePowerMultiplier}`
-            : elegido.tipo === 'armor'
-              ? `Protección ${elegido.objeto.protection}`
-              : elegido.tipo === 'potion'
-                ? `×${elegido.objeto.multiplier} ${elegido.objeto.stat}`
-                : 'Material de fabricación',
-      });
+  for (let indice = 0; indice < 10; indice += 1) {
+    let tirada = Math.random();
+    let nivel = MERCADO_NIVELES[MERCADO_NIVELES.length - 1];
+    for (const candidato of MERCADO_NIVELES) {
+      tirada -= candidato.probabilidad;
+      if (tirada < 0) {
+        nivel = candidato;
+        break;
+      }
     }
+    const candidatos = porNivel[nivel.id];
+    const elegido = candidatos.length ? candidatos[Math.floor(Math.random() * candidatos.length)] : null;
+    if (!elegido) continue;
+    const id = elegido.objeto[`${elegido.tipo}Id`] || elegido.objeto.materialId;
+    slots.push({
+      slotId: `mercado-${indice}`,
+      type: elegido.tipo,
+      itemId: id,
+      name: elegido.objeto.name,
+      price: nivel.precio,
+      rarity: nivel.id,
+      rarityName: nivel.nombre,
+      unique: elegido.tipo === 'weapon' || elegido.tipo === 'armor',
+      details:
+        elegido.tipo === 'weapon'
+          ? `${elegido.objeto.type}, poder ×${elegido.objeto.basePowerMultiplier}`
+          : elegido.tipo === 'armor'
+            ? `Protección ${elegido.objeto.protection}`
+            : elegido.tipo === 'potion'
+              ? `×${elegido.objeto.multiplier} ${elegido.objeto.stat}`
+              : 'Material de fabricación',
+    });
   }
   return slots;
 }
@@ -292,17 +300,12 @@ router.get('/bosses', ruta(async (req, res) => {
 // -------------------- MERCADO --------------------
 
 async function cargarMercado(usuario) {
-  if (Array.isArray(usuario.marketInventory) && usuario.marketInventory.length) {
+  if (Array.isArray(usuario.marketInventory) && usuario.marketInventory.length === 10) {
     return usuario.marketInventory;
   }
   const slots = construirMercado(await definicionesMercado(getDB()));
-  const resultado = await getDB().collection('usuarios').updateOne(
-    { _id: usuario._id, marketInventory: { $exists: false } },
-    { $set: { marketInventory: slots } }
-  );
-  if (resultado.matchedCount) return slots;
-  const guardado = await getDB().collection('usuarios').findOne({ _id: usuario._id }, { projection: { marketInventory: 1 } });
-  return guardado.marketInventory || slots;
+  await getDB().collection('usuarios').updateOne({ _id: usuario._id }, { $set: { marketInventory: slots } });
+  return slots;
 }
 
 router.get('/mercado', ruta(async (req, res) => {
@@ -312,10 +315,7 @@ router.get('/mercado', ruta(async (req, res) => {
   res.json({
     ok: true,
     gold: usuario.gold || 0,
-    tiers: MERCADO_NIVELES.map((nivel) => ({
-      ...nivel,
-      items: slots.filter((slot) => slot.rarity === nivel.id).map((slot) => estadoMercado(slot, usuario)),
-    })),
+    items: slots.map((slot) => estadoMercado(slot, usuario)),
   });
 }));
 
