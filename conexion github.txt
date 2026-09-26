@@ -5,16 +5,16 @@ git init
 git remote add origin https://github.com/FIdelrodri/PanasRPG.git
 
 # 3. Te parás en la rama principal
-git branch -M main
+git branch -a assets
 
 # 5. Descargás los archivos (Le agregamos la bandera para evitar errores de historial)
-git pull origin main --allow-unrelated-histories
+git pull origin assets --allow-unrelated-histories
 ---------
 # 1. Registrás todo lo nuevo, modificado o borrado
 git add .
 
 # 2. Guardás el punto de control local
-git commit -m "Actualizo el proyecto del Casino"
+git commit -a "Actualizo el proyecto"
 
 # 3. Lo mandás directo a la main en internet
-git push origin main
+git push origin assets
