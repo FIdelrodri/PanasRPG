@@ -10,29 +10,54 @@
 <body class="vista-batalla">
 
   <header class="encabezado">
-    <button type="button" class="boton boton--sutil" id="btn-volver">Volver al menú</button>
+    <button type="button" class="boton boton--sutil" id="btn-volver" disabled>Volver a la sala</button>
     <div class="encabezado__titulos">
       <p class="encabezado__tipo" id="bt-tipo"></p>
       <h1 class="encabezado__titulo" id="bt-titulo">Preparando la batalla…</h1>
     </div>
+    <button type="button" class="boton boton--sutil" id="btn-musica" aria-pressed="false">Activar música</button>
     <button type="button" class="boton boton--sutil" id="btn-logout">Cerrar sesión</button>
   </header>
 
-  <!-- Botón principal: "Comenzar pelea" antes de pelear, "Volver al menú" después -->
-  <section class="accion" id="accion" aria-live="polite"></section>
+  <main class="arena" id="arena" aria-label="Escena de batalla">
+    <button type="button" class="boton boton--saltar" id="btn-saltar" hidden>Saltar pelea</button>
 
-  <!-- Resultado de la pelea (se llena al terminar) -->
-  <section class="resultado" id="resultado" aria-label="Resultado de la pelea" hidden></section>
+    <section class="combatiente combatiente--jugador" aria-label="Tu personaje">
+      <div class="vida">
+        <div class="vida__rotulo"><span id="jugador-nombre">Protagonista</span><span id="jugador-vida-texto"></span></div>
+        <div class="vida__fondo" role="progressbar" id="jugador-vida" aria-label="Vida del protagonista" aria-valuemin="0">
+          <div class="vida__relleno vida__relleno--jugador" id="jugador-vida-relleno"></div>
+        </div>
+      </div>
+      <div class="personaje" id="jugador">
+        <img class="personaje__imagen" id="jugador-imagen" alt="">
+        <span class="personaje__placeholder" aria-hidden="true">Héroe</span>
+      </div>
+    </section>
 
-  <!-- Datos con los que se pelea -->
-  <main class="datos" id="datos"></main>
+    <p class="arena__vs" aria-hidden="true">VS</p>
 
-  <section class="crudo">
-    <details>
-      <summary>Ver los datos tal como llegan (JSON)</summary>
-      <pre id="crudo"></pre>
-    </details>
+    <section class="combatiente combatiente--enemigo" aria-label="Enemigo">
+      <div class="vida">
+        <div class="vida__rotulo"><span id="enemigo-nombre">Enemigo</span><span id="enemigo-vida-texto"></span></div>
+        <div class="vida__fondo" role="progressbar" id="enemigo-vida" aria-label="Vida del enemigo" aria-valuemin="0">
+          <div class="vida__relleno vida__relleno--enemigo" id="enemigo-vida-relleno"></div>
+        </div>
+      </div>
+      <div class="personaje personaje--enemigo" id="enemigo">
+        <img class="personaje__imagen" id="enemigo-imagen" alt="">
+        <span class="personaje__placeholder" aria-hidden="true">Enemigo</span>
+      </div>
+    </section>
+
+    <p class="arena__estado" id="estado-combate" aria-live="polite">Preparando el combate…</p>
+  </main>
+
+  <section class="resultado-modal" id="resultado-modal" role="dialog" aria-modal="true" aria-labelledby="resultado-titulo" hidden>
+    <article class="resultado-tarjeta" id="resultado-tarjeta"></article>
   </section>
+
+  <audio id="musica-batalla" src="../../audio/canciones/musica_musica%20pelea.mp3" loop preload="auto"></audio>
 
   <div class="aviso" id="aviso" role="status" aria-live="polite"></div>
 

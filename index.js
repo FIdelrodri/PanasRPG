@@ -105,6 +105,8 @@ app.post('/registro', async (req, res) => {
         potionIds: [], // hasta 3 por combate
       },
       defeatedBosses: [], // ["B1", "B2", ...]
+      enemyDefeats: {}, // { enemyId: cantidad de victorias confirmadas }
+      battleReceipts: [], // ids de combates ya aplicados; evita cobrar dos veces
       createdAt: new Date(),
     };
 

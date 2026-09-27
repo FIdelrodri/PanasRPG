@@ -14,7 +14,8 @@
  *   GET    /api/crafteo                  todas las recetas y materiales del usuario
  *   POST   /api/crafteo                   fabrica una receta
  *   POST   /api/combate/iniciar          arma el paquete de batalla
- *   POST   /api/combate/resolver         simula la pelea, da recompensas y actualiza la cuenta
+ *   POST   /api/combate/resolver         simula la pelea y guarda un resultado pendiente
+ *   POST   /api/combate/confirmar        aplica recompensas y pociones al volver a la sala
  *   GET    /api/combate/actual           paquete y/o resultado guardados en la sesión
  *   DELETE /api/combate/actual           descarta paquete y resultado (volver al menú)
  */
@@ -519,6 +520,8 @@ router.post('/combate/iniciar', ruta(async (req, res) => {
     armaEspecial,
     nombresMateriales,
   });
+  paquete.puedeSaltar =
+    tipo === 'enemigo' && (usuario.enemyDefeats || {})[id] >= 3;
 
   const falta = combate.faltantes(paquete);
   if (falta.length) {
@@ -544,6 +547,7 @@ router.post('/combate/iniciar', ruta(async (req, res) => {
 // clic o dos pestañas cobren la misma pelea dos veces. Es memoria del proceso:
 // si algún día hay varios procesos del servidor, hay que pasarlo a la base.
 const combatesResueltos = new Set();
+const confirmacionesEnCurso = new Set();
 
 function recordarResuelto(id) {
   combatesResueltos.add(id);
@@ -553,7 +557,6 @@ function recordarResuelto(id) {
 }
 
 router.post('/combate/resolver', ruta(async (req, res) => {
-  const db = getDB();
   const usuario = await cargarUsuario(req);
   if (!usuario) return res.status(401).json({ ok: false, error: 'Sesión inválida' });
 
@@ -586,43 +589,9 @@ router.post('/combate/resolver', ruta(async (req, res) => {
       ? combate.aplicarXp(usuario.level, usuario.xp, rec.xp, cfg)
       : { nivel: usuario.level, xp: usuario.xp, subidos: 0 };
 
-    // ---- Actualización de la cuenta (una sola operación) ----
-    // El filtro comprueba que la cuenta no cambió mientras tanto (nivel/xp) y
-    // que las pociones siguen existiendo; si no, no se toca nada.
-    const filtro = { _id: usuario._id, level: usuario.level, xp: usuario.xp };
-    const inc = {};
-    const set = {};
-    const update = {};
-
-    for (const p of paquete.equipo.pociones) {
-      filtro[`ownedPotions.${p.potionId}`] = { $gte: 1 };
-      inc[`ownedPotions.${p.potionId}`] = -1; // se gastan ganes o pierdas
-    }
-    if (sim.victoria) {
-      if (rec.oro) inc.gold = rec.oro;
-      for (const d of rec.drops) {
-        inc[`materials.${d.materialId}`] = (inc[`materials.${d.materialId}`] || 0) + d.cantidad;
-      }
-      set.level = prog.nivel;
-      set.xp = prog.xp;
-      if (esBoss && !repetido) update.$addToSet = { defeatedBosses: paquete.objetivo.id };
-    }
-    if (Object.keys(inc).length) update.$inc = inc;
-    if (Object.keys(set).length) update.$set = set;
-
-    if (Object.keys(update).length) {
-      const r = await db.collection('usuarios').updateOne(filtro, update);
-      if (!r.matchedCount) {
-        combatesResueltos.delete(paquete.id);
-        return res.status(409).json({
-          ok: false,
-          error: 'Tu cuenta cambió mientras peleabas. Volvé al menú y probá de nuevo.',
-        });
-      }
-    }
-
     const nivelMax = combate.nivelMaximo(cfg);
     resultado = {
+      confirmado: false,
       resueltoEn: new Date().toISOString(),
       victoria: sim.victoria,
       ganador: sim.ganador,
@@ -655,9 +624,87 @@ router.post('/combate/resolver', ruta(async (req, res) => {
   delete req.session.combate;
   req.session.save((err) => {
     if (err) console.error('Error guardando la sesión:', err);
-    // La cuenta ya se actualizó: se devuelve el resultado aunque falle guardar la sesión.
     res.json({ ok: true, resultado });
   });
+}));
+
+router.post('/combate/confirmar', ruta(async (req, res) => {
+  const db = getDB();
+  const usuario = await cargarUsuario(req);
+  if (!usuario) return res.status(401).json({ ok: false, error: 'Sesión inválida' });
+
+  const resultado = req.session.resultado;
+  if (!resultado) return res.status(404).json({ ok: false, error: 'No hay un resultado pendiente' });
+  if (resultado.confirmado || (usuario.battleReceipts || []).includes(resultado.paquete.id)) {
+    resultado.confirmado = true;
+    return res.json({ ok: true, resultado });
+  }
+  if (confirmacionesEnCurso.has(resultado.paquete.id)) {
+    return res.status(409).json({ ok: false, error: 'El resultado se está confirmando' });
+  }
+
+  confirmacionesEnCurso.add(resultado.paquete.id);
+  try {
+    const paquete = resultado.paquete;
+    const esBoss = paquete.objetivo.kind === 'boss';
+    const esEnemigo = paquete.objetivo.kind === 'enemigo';
+    const repetido = esBoss && (usuario.defeatedBosses || []).includes(paquete.objetivo.id);
+    const cfg = await cargarConfig();
+    const rec = resultado.recompensas;
+    const prog = resultado.victoria
+      ? combate.aplicarXp(usuario.level, usuario.xp, rec.xp, cfg)
+      : { nivel: usuario.level, xp: usuario.xp, subidos: 0 };
+
+    const filtro = {
+      _id: usuario._id,
+      level: usuario.level,
+      xp: usuario.xp,
+      battleReceipts: { $ne: paquete.id },
+    };
+    const inc = {};
+    const set = {};
+    const addToSet = { battleReceipts: paquete.id };
+
+    for (const potion of paquete.equipo.pociones) {
+      filtro[`ownedPotions.${potion.potionId}`] = { $gte: 1 };
+      inc[`ownedPotions.${potion.potionId}`] = -1;
+    }
+    if (resultado.victoria) {
+      if (rec.oro) inc.gold = rec.oro;
+      for (const drop of rec.drops) {
+        inc[`materials.${drop.materialId}`] = (inc[`materials.${drop.materialId}`] || 0) + drop.cantidad;
+      }
+      set.level = prog.nivel;
+      set.xp = prog.xp;
+      if (esBoss && !repetido) addToSet.defeatedBosses = paquete.objetivo.id;
+      if (esEnemigo) inc[`enemyDefeats.${paquete.objetivo.id}`] = 1;
+    }
+
+    const update = { $addToSet: addToSet };
+    if (Object.keys(inc).length) update.$inc = inc;
+    if (Object.keys(set).length) update.$set = set;
+    const applied = await db.collection('usuarios').updateOne(filtro, update);
+    if (!applied.matchedCount) {
+      const actual = await db.collection('usuarios').findOne(
+        { _id: usuario._id },
+        { projection: { battleReceipts: 1 } }
+      );
+      if (!(actual && (actual.battleReceipts || []).includes(paquete.id))) {
+        return res.status(409).json({
+          ok: false,
+          error: 'Tu cuenta cambió mientras peleabas. El resultado no se pudo aplicar.',
+        });
+      }
+    }
+
+    resultado.confirmado = true;
+    req.session.save((err) => {
+      if (err) console.error('Error guardando la sesión:', err);
+      res.json({ ok: true, resultado });
+    });
+  } finally {
+    confirmacionesEnCurso.delete(resultado.paquete.id);
+  }
 }));
 
 router.get('/combate/actual', (req, res) => {
