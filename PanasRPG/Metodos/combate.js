@@ -158,6 +158,7 @@ function construirPaquete(datos) {
     objetivoPaquete = {
       kind,
       id: objetivo.enemyId,
+      worldEnemyIndex: objetivo.worldEnemyIndex,
       name: objetivo.name,
       progressionRank: objetivo.progressionRank,
       stats: { ...objetivo.stats },
