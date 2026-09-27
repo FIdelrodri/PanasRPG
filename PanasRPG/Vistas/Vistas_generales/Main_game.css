@@ -237,6 +237,17 @@
   background: var(--placa-alta);
 }
 
+.mercado__item-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mercado__item-icono {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
 .mercado__item-nombre {
   font-weight: 600;
   overflow-wrap: anywhere;
@@ -286,6 +297,17 @@
   border-bottom: 1px solid rgba(93, 129, 150, 0.35);
 }
 
+.receta__titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.receta__icono {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
 .receta__nombre {
   font-weight: 700;
 }
@@ -297,11 +319,20 @@
 }
 
 .receta__ingrediente {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   padding: 0.25rem 0.45rem;
   border: 1px solid var(--borde);
   border-radius: var(--radio-chico);
   color: var(--texto-suave);
   font-size: 0.8125rem;
+}
+
+.receta__ingrediente-icono {
+  width: 1.35rem;
+  height: 1.35rem;
+  padding: 0.1rem;
 }
 
 .receta__ingrediente--falta {
@@ -371,6 +402,24 @@
   font: inherit;
 }
 
+/* ---------- Iconos de objetos ---------- */
+
+.icono-item {
+  flex: 0 0 auto;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0.2rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-chico);
+  background-color: var(--placa-alta);
+  object-fit: contain;
+}
+
+.fila__icono {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
 /* ---------- Equipo ---------- */
 
 .grupo + .grupo {
@@ -396,9 +445,9 @@
 
 .opcion {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.15rem;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.6rem;
   min-height: var(--alto-toque);
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--borde);
@@ -406,6 +455,13 @@
   background-color: var(--placa-alta);
   text-align: left;
   cursor: pointer;
+}
+
+.opcion__texto {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
 }
 
 .opcion:hover:not(:disabled) {

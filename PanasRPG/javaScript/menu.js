@@ -13,6 +13,8 @@
   document.documentElement.classList.add('js');
 
   const URL_INICIO = '../Menus/inicio/inicio.html'; // relativa a Vistas_generales/
+  const RUTA_ITEMS = '../../assets/Items/'; // relativa a Vistas_generales/
+  const ITEM_SIN_ASSET = '404_item';
 
   const ARMAS = {
     sword: 'Espada',
@@ -73,6 +75,27 @@
   const numero = (n) => Number(n).toLocaleString('es-AR', { maximumFractionDigits: 2 });
   const multiplicador = (m) => `×${numero(m)}`;
   const armaTipo = (t) => ARMAS[t] || t;
+
+  // El nombre del archivo es siempre el id del objeto (arma, armadura, poción o
+  // material) + ".png". Si el id no tiene asset (o el archivo no está), se cae
+  // al 404_item.png que Fidel dejó como placeholder.
+  const rutaImagenItem = (id) => `${RUTA_ITEMS}${encodeURIComponent(id || ITEM_SIN_ASSET)}.png`;
+
+  function iconoItem(id, alt = '', clase = 'icono-item') {
+    return el('img', {
+      class: clase,
+      src: rutaImagenItem(id),
+      alt,
+      loading: 'lazy',
+      decoding: 'async',
+      onerror: (evento) => {
+        const img = evento.currentTarget;
+        if (img.dataset.sinAsset) return; // evita loop si el propio 404_item.png falta
+        img.dataset.sinAsset = '1';
+        img.src = rutaImagenItem(null);
+      },
+    });
+  }
 
   // La API puede mandar una debilidad/resistencia sola o una lista.
   const comoLista = (x) => (Array.isArray(x) ? x : x ? [x] : []);
@@ -139,7 +162,7 @@
 
   // -------------------------------------------------------------------- equipo
 
-  function opcion({ titulo, detalle, activa, deshabilitada, alHacerClick }) {
+  function opcion({ id, titulo, detalle, activa, deshabilitada, alHacerClick }) {
     return el(
       'button',
       {
@@ -149,9 +172,14 @@
         disabled: deshabilitada,
         onclick: alHacerClick,
       },
-      el('span', { class: 'opcion__titulo' }, titulo),
-      detalle && el('span', { class: 'opcion__detalle' }, detalle),
-      activa && el('span', { class: 'opcion__marca' }, 'Equipado')
+      id && iconoItem(id, titulo),
+      el(
+        'span',
+        { class: 'opcion__texto' },
+        el('span', { class: 'opcion__titulo' }, titulo),
+        detalle && el('span', { class: 'opcion__detalle' }, detalle),
+        activa && el('span', { class: 'opcion__marca' }, 'Equipado')
+      )
     );
   }
 
@@ -172,12 +200,14 @@
               'div',
               { class: 'opciones' },
               opcion({
+                id: null,
                 titulo: 'Sin arma',
                 activa: eq.weaponId === null,
                 alHacerClick: () => cambiarEquipo({ weaponId: null }),
               }),
               weapons.map((w) =>
                 opcion({
+                  id: w.weaponId,
                   titulo: w.name,
                   detalle: `${armaTipo(w.type)}, poder ${multiplicador(w.basePowerMultiplier)}`,
                   activa: eq.weaponId === w.weaponId,
@@ -200,12 +230,14 @@
               'div',
               { class: 'opciones' },
               opcion({
+                id: null,
                 titulo: 'Sin armadura',
                 activa: eq.armorId === null,
                 alHacerClick: () => cambiarEquipo({ armorId: null }),
               }),
               armors.map((a) =>
                 opcion({
+                  id: a.armorId,
                   titulo: a.name,
                   detalle: `Protección ${numero(a.protection)}`,
                   activa: eq.armorId === a.armorId,
@@ -236,6 +268,7 @@
               potions.map((p) => {
                 const activa = eq.potionIds.includes(p.potionId);
                 return opcion({
+                  id: p.potionId,
                   titulo: p.name,
                   detalle: `${STATS[p.stat] || p.stat} ${multiplicador(p.multiplier)}, tenés ${numero(p.quantity)}`,
                   activa,
@@ -352,6 +385,7 @@
     return el(
       'li',
       { class: 'fila' },
+      iconoItem(item.id, item.nombre, 'icono-item fila__icono'),
       el(
         'div',
         { class: 'fila__principal' },
@@ -617,7 +651,12 @@
           el(
             'article',
             { class: 'mercado__item' },
-            el('span', { class: 'mercado__item-nombre' }, item.name),
+            el(
+              'div',
+              { class: 'mercado__item-cabecera' },
+              iconoItem(item.itemId, item.name, 'icono-item mercado__item-icono'),
+              el('span', { class: 'mercado__item-nombre' }, item.name)
+            ),
             el('span', { class: 'mercado__item-detalle' }, `${item.rarityName} · ${item.details}`),
             el(
               'button',
@@ -701,7 +740,12 @@
         el(
         'div',
         { class: 'receta__cabecera' },
-        el('span', { class: 'receta__nombre' }, receta.outputName),
+        el(
+          'div',
+          { class: 'receta__titulo' },
+          iconoItem(receta.output.id, receta.outputName, 'icono-item receta__icono'),
+          el('span', { class: 'receta__nombre' }, receta.outputName)
+        ),
         el('span', { class: 'fila__detalle' }, receta.owned ? 'Ya poseído' : `Receta ${receta.recipeId}`)
         ),
         el(
@@ -711,6 +755,7 @@
           el(
           'span',
           { class: `receta__ingrediente${item.available < item.quantity ? ' receta__ingrediente--falta' : ''}` },
+          iconoItem(item.materialId, item.name, 'icono-item receta__ingrediente-icono'),
           `${item.name}: ${item.available}/${item.quantity}`
           )
         )
