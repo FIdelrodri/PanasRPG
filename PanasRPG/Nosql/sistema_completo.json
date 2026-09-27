@@ -153,7 +153,7 @@
       "stackable": true
     },
     {
-      "materialId": "cristal_caverna",
+      "materialId": "material_cristal_caverna",
       "name": "Cristal de caverna",
       "type": "material",
       "stackable": true
@@ -3548,7 +3548,7 @@
             "max": 2
           },
           {
-            "materialId": "cristal_caverna",
+            "materialId": "material_cristal_caverna",
             "chance": 0.306,
             "min": 1,
             "max": 2
@@ -3833,7 +3833,7 @@
             "max": 3
           },
           {
-            "materialId": "cristal_caverna",
+            "materialId": "material_cristal_caverna",
             "chance": 0.376,
             "min": 1,
             "max": 3
@@ -4118,7 +4118,7 @@
             "max": 4
           },
           {
-            "materialId": "cristal_caverna",
+            "materialId": "material_cristal_caverna",
             "chance": 0.446,
             "min": 1,
             "max": 4
@@ -4403,7 +4403,7 @@
             "max": 5
           },
           {
-            "materialId": "cristal_caverna",
+            "materialId": "material_cristal_caverna",
             "chance": 0.516,
             "min": 1,
             "max": 5
@@ -4688,7 +4688,7 @@
             "max": 6
           },
           {
-            "materialId": "cristal_caverna",
+            "materialId": "material_cristal_caverna",
             "chance": 0.586,
             "min": 1,
             "max": 6
@@ -8300,7 +8300,7 @@
           "quantity": 20
         },
         {
-          "materialId": "cristal_caverna",
+          "materialId": "material_cristal_caverna",
           "quantity": 12
         },
         {
@@ -8484,7 +8484,7 @@
       },
       "ingredients": [
         {
-          "materialId": "cristal_caverna",
+          "materialId": "material_cristal_caverna",
           "quantity": 3
         },
         {
