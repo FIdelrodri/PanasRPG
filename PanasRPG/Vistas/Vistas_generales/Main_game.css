@@ -516,6 +516,161 @@
   font-weight: 600;
 }
 
+/* ---------- Enemigos con marco (Combate > Mundos) ----------
+  Cada enemigo es una tarjeta con el marco de su mundo dibujado por
+  "border-image" (9-slice): las esquinas y los bordes conservan el dibujo
+  y solo se estira el centro negro, así la tarjeta se adapta al alto que
+  necesite el contenido sin deformar el marco.
+
+  Variables de cada marco (en píxeles de la imagen original):
+    --ancho            ancho de la imagen
+    --sup/--der/--inf/--izq   cuánto mide cada borde hasta donde empieza
+                       el rectángulo negro liso donde entra el contenido
+    --factor           tamaño del marco respecto al ancho de la tarjeta
+    --k-min            escala mínima (que en celular no quede diminuto)
+  El contenido se coloca con padding = borde × escala, por eso siempre
+  queda dentro del negro sin pisar el dibujo. */
+
+.lista-scroll--combate {
+  container-type: inline-size;
+}
+
+.enemigos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.75rem;
+}
+
+.enemigo {
+  --k: calc(var(--factor) * 0.7px); /* respaldo si no hay unidades cqw */
+  position: relative;
+  isolation: isolate;
+  padding: calc(var(--sup) * var(--k) + 0.3rem) calc(var(--der) * var(--k) + 0.4rem)
+    calc(var(--inf) * var(--k) + 0.3rem) calc(var(--izq) * var(--k) + 0.4rem);
+}
+
+@supports (width: 1cqw) {
+  .enemigo {
+    --k: max(calc(var(--factor) * 100cqw / var(--ancho)), var(--k-min));
+  }
+}
+
+.enemigo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-style: solid;
+  border-color: transparent;
+  border-width: calc(var(--sup) * var(--k)) calc(var(--der) * var(--k))
+    calc(var(--inf) * var(--k)) calc(var(--izq) * var(--k));
+  border-image-source: var(--marco);
+  border-image-slice: var(--sup) var(--der) var(--inf) var(--izq) fill;
+  border-image-width: 1;
+  border-image-repeat: stretch;
+}
+
+.enemigo__contenido {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.enemigo__info {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.enemigo__nombre {
+  font: 700 1.0625rem/1.25 var(--fuente-titulo);
+  overflow-wrap: anywhere;
+  text-shadow: 0 1px 2px #000;
+}
+
+.enemigo__detalle {
+  color: var(--texto-suave);
+  font-size: 0.875rem;
+}
+
+.enemigo .boton {
+  flex: 0 0 auto;
+  min-width: 5.5rem;
+}
+
+@media (max-width: 480px) {
+  .enemigo__contenido {
+    gap: 0.5rem;
+  }
+
+  .enemigo .boton {
+    min-width: 4.25rem;
+    padding-inline: 0.7rem;
+  }
+}
+
+/* En Mundos el contenedor de la lista desaparece: los marcos quedan
+   directamente sobre el fondo de la pantalla. El panel pierde su fondo y
+   su borde, y solo la cabecera, las pestañas y los botones de mundo
+   conservan el fondo de panel (para que se lean). */
+.seccion--combate:has(#panel-mundos:not([hidden])) {
+  background: none;
+  border: 0;
+}
+
+.seccion--combate:has(#panel-mundos:not([hidden])) > .panel__cabecera,
+.seccion--combate:has(#panel-mundos:not([hidden])) > .pestanas,
+#panel-mundos > .filtros {
+  background-color: var(--placa);
+  border-right: 1px solid var(--borde);
+  border-left: 1px solid var(--borde);
+}
+
+.seccion--combate:has(#panel-mundos:not([hidden])) > .panel__cabecera {
+  border-top: 3px solid var(--laton);
+  border-radius: 4px 16px 0 0;
+}
+
+.lista-scroll--combate {
+  scrollbar-width: thin;
+  scrollbar-color: var(--borde-fuerte) transparent;
+}
+
+/* Medidas de cada marco (imagen original: --ancho de ancho) */
+.marco--bosque {
+  --marco: var(--img-marco-bosque);
+  --ancho: 1024; --sup: 48; --der: 39; --inf: 49; --izq: 44;
+  --factor: 0.7; --k-min: 0.4px;
+}
+
+.marco--cueva {
+  --marco: var(--img-marco-cueva);
+  --ancho: 1024; --sup: 53; --der: 111; --inf: 57; --izq: 104;
+  --factor: 0.7; --k-min: 0.32px;
+}
+
+.marco--nieve {
+  --marco: var(--img-marco-nieve);
+  --ancho: 2170; --sup: 164; --der: 97; --inf: 161; --izq: 109;
+  --factor: 0.7; --k-min: 0.15px;
+}
+
+.marco--dragones {
+  --marco: var(--img-marco-dragones);
+  --ancho: 2170; --sup: 141; --der: 233; --inf: 158; --izq: 213;
+  --factor: 0.7; --k-min: 0.15px;
+}
+
+.marco--ajedrez {
+  --marco: var(--img-marco-ajedrez);
+  --ancho: 1024; --sup: 49; --der: 69; --inf: 63; --izq: 70;
+  --factor: 0.7; --k-min: 0.4px;
+}
+
 /* ---------- Combate ---------- */
 
 .fila .boton {

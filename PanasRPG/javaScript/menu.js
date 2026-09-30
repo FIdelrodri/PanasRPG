@@ -28,6 +28,15 @@
   };
   const STATS = { hp: 'Vida', attack: 'Ataque', crit: 'Crítico', dodge: 'Esquiva', all: 'Todo' };
 
+  // Marco de la lista de enemigos de cada mundo (ver .marco--* en Main_game.css).
+  const MARCOS_MUNDO = {
+    W1: 'bosque',
+    W2: 'cueva',
+    W3: 'nieve', // Hielo
+    W4: 'dragones',
+    W5: 'ajedrez',
+  };
+
   const CATEGORIAS = [
     { id: 'armas', nombre: 'Armas' },
     { id: 'armaduras', nombre: 'Armaduras' },
@@ -554,26 +563,32 @@
       return;
     }
 
+    const marco = MARCOS_MUNDO[worldId] || 'bosque';
+
     cont.append(
       el(
         'ul',
-        { class: 'lista' },
+        { class: 'enemigos' },
         lista.map((e) =>
           el(
             'li',
-            { class: 'fila' },
+            { class: `enemigo marco--${marco}` },
             el(
               'div',
-              { class: 'fila__principal' },
-              el('span', { class: 'fila__nombre' }, e.name),
+              { class: 'enemigo__contenido' },
               el(
-                'span',
-                { class: 'fila__detalle' },
-                `Rango ${e.progressionRank}, vida ${numero(e.stats.hp)}, ataque ${numero(e.stats.attack)}`
+                'div',
+                { class: 'enemigo__info' },
+                el('span', { class: 'enemigo__nombre' }, e.name),
+                el(
+                  'span',
+                  { class: 'enemigo__detalle' },
+                  `Rango ${e.progressionRank}, vida ${numero(e.stats.hp)}, ataque ${numero(e.stats.attack)}`
+                ),
+                el('div', { class: 'etiquetas' }, etiquetasCombate(e.combat))
               ),
-              el('div', { class: 'etiquetas' }, etiquetasCombate(e.combat))
-            ),
-            el('div', { class: 'fila__lado' }, botonPelear('enemigo', e.enemyId, e.name, false))
+              botonPelear('enemigo', e.enemyId, e.name, false)
+            )
           )
         )
       )

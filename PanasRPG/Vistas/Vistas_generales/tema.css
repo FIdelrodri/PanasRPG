@@ -18,6 +18,17 @@
   --img-boton: none; /* botones principales (Pelear, etc.) */
   --img-insignia: none; /* escudo del nivel */
 
+  /* Marcos de la lista de enemigos, uno por mundo (Combate > Mundos).
+     Cada marco se estira con 9-slice: las medidas de cada uno están en
+     Main_game.css (.marco--bosque, .marco--cueva, etc.). Si se cambia la
+     imagen por otra con otro tamaño o interior, hay que ajustar ahí sus
+     números (--ancho, --izq, --der, --sup, --inf). */
+  --img-marco-bosque: url('../../imagenes/menus/general/Marco_enemigos_bosque.png');
+  --img-marco-cueva: url('../../imagenes/menus/general/Marco_enemigos_cueva.png');
+  --img-marco-nieve: url('../../imagenes/menus/general/Marco_enemigos_nieve.png');
+  --img-marco-dragones: url('../../imagenes/menus/general/Marco_enemigos_dragones.png');
+  --img-marco-ajedrez: url('../../imagenes/menus/general/Marco_enemigos_ajedrez.png');
+
   /* ---- Colores ---- */
   --noche: #15222c;
   --noche-honda: #0e1820;

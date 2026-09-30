@@ -1,74 +1,6 @@
 # PanasRPG
 proyecto no sql 
 
-
-
-```
-www
-├─ conexion github.txt
-├─ index.js
-├─ package-lock.json
-├─ package.json
-├─ PanasRPG
-│  ├─ audio
-│  │  ├─ canciones
-│  │  │  ├─ musica_cancion_menu.mp3
-│  │  │  ├─ musica_musica chill.mp3
-│  │  │  └─ musica_musica pelea.mp3
-│  │  └─ efectos_de_sonido
-│  │     └─ relleno.txt
-│  ├─ imagenes
-│  │  ├─ 3d
-│  │  │  └─ relleno.txt
-│  │  ├─ Fondos
-│  │  │  ├─ 023751f8-d502-458b-83db-92b743cb2386 (1).png
-│  │  │  ├─ fondo_login.png
-│  │  │  └─ Fondo_registro.jpg
-│  │  ├─ imangenes_MISC
-│  │  │  └─ logo.png
-│  │  ├─ items
-│  │  │  ├─ Armas
-│  │  │  │  └─ espada ejemplo.png
-│  │  │  ├─ enemigos
-│  │  │  │  └─ enemigo ejemplo.png
-│  │  │  ├─ Items_misc
-│  │  │  │  └─ relleno.txt
-│  │  │  └─ Personajes
-│  │  │     └─ Personaje ejemplo.png
-│  │  └─ menus
-│  │     ├─ inicio
-│  │     │  ├─ boton_login.png
-│  │     │  ├─ notienesunacuenta.png
-│  │     │  └─ panel_login.png
-│  │     └─ registro
-│  │        ├─ boton_registrarse.png
-│  │        ├─ panel_registro.png
-│  │        └─ ya_tienes_cuenta.png
-│  ├─ javaScript
-│  │  ├─ login.js
-│  │  ├─ musicas_js
-│  │  │  └─ Musica_menu_registro.js
-│  │  ├─ registro.js
-│  │  └─ sesion.js
-│  ├─ Metodos
-│  │  ├─ db.js
-│  │  └─ seed.js
-│  ├─ Nosql
-│  │  └─ sistema_completo.json
-│  └─ Vistas
-│     ├─ Menus
-│     │  ├─ inicio
-│     │  │  ├─ inicio.css
-│     │  │  └─ inicio.html
-│     │  └─ Registro
-│     │     ├─ registro.css
-│     │     └─ registro.html
-│     └─ Vistas_generales
-│        ├─ Main_batalla.html
-│        └─ Main_game.html
-└─ README.md
-
-```
 ```
 www
 ├─ conexion github.txt
@@ -78,7 +10,67 @@ www
 ├─ PanasRPG
 │  ├─ assets
 │  │  ├─ Items
-│  │  │  └─ 404_item.png
+│  │  │  ├─ 404_item.png
+│  │  │  ├─ arco_cazador.png
+│  │  │  ├─ arco_draconico.png
+│  │  │  ├─ baston_arcano.png
+│  │  │  ├─ carbón.png
+│  │  │  ├─ ceniza_eterna.png
+│  │  │  ├─ cobre.png
+│  │  │  ├─ corazon_dragon.png
+│  │  │  ├─ corona_helada.png
+│  │  │  ├─ cristal_caverna.png
+│  │  │  ├─ cristal_comun.png
+│  │  │  ├─ cristal_draconico.png
+│  │  │  ├─ cristal_helado.png
+│  │  │  ├─ cristal_tablero.png
+│  │  │  ├─ cuero.png
+│  │  │  ├─ cuero_reforzado.png
+│  │  │  ├─ daga_sombra.png
+│  │  │  ├─ dama_blade.png
+│  │  │  ├─ elixir_batalla.png
+│  │  │  ├─ escama_draconica.png
+│  │  │  ├─ escama_dragon.png
+│  │  │  ├─ escarcha.png
+│  │  │  ├─ esencia_monstruosa.png
+│  │  │  ├─ espada_bosque.png
+│  │  │  ├─ espada_hierro.png
+│  │  │  ├─ fibra_forestal.png
+│  │  │  ├─ fibra_resistente.png
+│  │  │  ├─ fragmento_mineral.png
+│  │  │  ├─ hacha_batalla.png
+│  │  │  ├─ hielo_boreal.png
+│  │  │  ├─ hielo_compacto.png
+│  │  │  ├─ hierro.png
+│  │  │  ├─ hierro_montano.png
+│  │  │  ├─ hueso_draconico.png
+│  │  │  ├─ jaque_final.png
+│  │  │  ├─ lanza_acero.png
+│  │  │  ├─ lanza_glacial.png
+│  │  │  ├─ madera_ajedrez.png
+│  │  │  ├─ madera_viva.png
+│  │  │  ├─ manto_ancestral.png
+│  │  │  ├─ marfil.png
+│  │  │  ├─ martillo_guerra.png
+│  │  │  ├─ matadragones.png
+│  │  │  ├─ material_cristal_caverna.png
+│  │  │  ├─ musgo_guardian.png
+│  │  │  ├─ nucleo_real.png
+│  │  │  ├─ núcleo_glacial.png
+│  │  │  ├─ obsidiana.png
+│  │  │  ├─ obsidiana_real.png
+│  │  │  ├─ obsidiana_tablero.png
+│  │  │  ├─ pico_caverna.png
+│  │  │  ├─ piel_boreal.png
+│  │  │  ├─ piel_silvestre.png
+│  │  │  ├─ pocion_furia.png
+│  │  │  ├─ pocion_precision.png
+│  │  │  ├─ pocion_reflejos.png
+│  │  │  ├─ pocion_vital.png
+│  │  │  ├─ raiz_ancestral.png
+│  │  │  ├─ resina.png
+│  │  │  ├─ rompeescamas.png
+│  │  │  └─ semilla_ancestral.png
 │  │  ├─ Mapas
 │  │  │  ├─ Fondo_Mundo_1.jpg
 │  │  │  ├─ Fondo_Mundo_2.jpg
@@ -87,8 +79,6 @@ www
 │  │  │  └─ Fondo_Mundo_5.jpg
 │  │  └─ Personajes
 │  │     ├─ Enemigos
-│  │     │  ├─ 404_enemigo.jpg
-│  │     │  └─ enemigo_1_1.png
 │  │     └─ Protagonista
 │  │        ├─ cristal_caverna_armadura.png
 │  │        ├─ cuero_reforzado_armadura.png
@@ -116,6 +106,13 @@ www
 │  │  ├─ imangenes_MISC
 │  │  │  └─ logo.png
 │  │  └─ menus
+│  │     ├─ general
+│  │     │  ├─ Cartel Mercado PNG.png
+│  │     │  ├─ Marco_enemigos_ajedrez.png
+│  │     │  ├─ Marco_enemigos_bosque.png
+│  │     │  ├─ Marco_enemigos_cueva.png
+│  │     │  ├─ Marco_enemigos_dragones.png
+│  │     │  └─ Marco_enemigos_nieve.png
 │  │     ├─ inicio
 │  │     │  ├─ boton_login.png
 │  │     │  ├─ notienesunacuenta.png
