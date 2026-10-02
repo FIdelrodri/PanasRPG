@@ -497,10 +497,145 @@
 
 /* ---------- Inventario ---------- */
 
-.lista__grupo {
-  padding: 0.6rem 1.1rem 0.3rem;
-  border-bottom: 1px solid var(--laton-oscuro);
-  font: 700 0.9375rem/1.3 var(--fuente-titulo);
+/* En Inventario el contenedor de la lista desaparece: los marcos quedan
+   directamente sobre el fondo de la pantalla. Igual que en Mundos, solo la
+   cabecera y los filtros conservan el fondo de panel (para que se lean). */
+.seccion--inventario {
+  background: none;
+  border: 0;
+}
+
+.seccion--inventario > .panel__cabecera,
+.seccion--inventario > .filtros {
+  background-color: var(--placa);
+  border-right: 1px solid var(--borde);
+  border-left: 1px solid var(--borde);
+}
+
+.seccion--inventario > .panel__cabecera {
+  border-top: 3px solid var(--laton);
+  border-radius: 4px 16px 0 0;
+}
+
+.seccion--inventario .vacio {
+  margin-top: 0.5rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-chico);
+  background-color: var(--placa);
+}
+
+.lista-scroll--inventario {
+  scrollbar-width: thin;
+  scrollbar-color: var(--borde-fuerte) transparent;
+}
+
+/* Cada objeto va dentro de un marco dibujado con "border-image" (9-slice),
+   igual que los enemigos: las esquinas y los bordes no se deforman y solo se
+   estira el centro negro, así el marco crece con el contenido.
+
+   Medidas en píxeles de la imagen original (500 de ancho):
+     --sup / --izq / --der   grosor del borde hasta el negro liso
+     --inf                   35 en el marco sin cadenas; 98 en el de cadenas
+                             (35 del borde + 63 de cadena que cuelga)
+   --k es la escala (ancho del marco / 500). Los marcos miden como máximo
+   500px de ancho y se achican en pantallas angostas. Como las cadenas están
+   en el borde de abajo, el marco siguiente queda pegado a donde terminan. */
+
+.lista-scroll--inventario {
+  container-type: inline-size;
+}
+
+.inv {
+  --ancho-marco: 100%;
+  --k: 0.7px; /* respaldo si el navegador no soporta unidades cqw */
+  --solape: 50; /* px de la imagen que la cadena se mete en el marco de abajo */
+  --escala-cartel: 0.4; /* tamaño del cartel respecto a su imagen original */
+  align-items: flex-start; /* carteles pegados al borde izquierdo de los marcos */
+  width: var(--ancho-marco);
+  margin-inline: auto;
+  padding: 0.75rem 0;
+}
+
+@supports (width: 1cqw) {
+  .inv {
+    --ancho-marco: min(100cqw, 500px);
+    --k: calc(var(--ancho-marco) / 500);
+  }
+}
+
+.inv-item {
+  --sup: 30;
+  --izq: 28;
+  --der: 25;
+  --inf: 35;
+  --marco: var(--img-inv-sin-cadenas);
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
+  width: 100%;
+  z-index: 1;
+  padding: calc(var(--sup) * var(--k) + 0.2rem) calc(var(--der) * var(--k) + 0.3rem)
+    calc(var(--inf) * var(--k) + 0.2rem) calc(var(--izq) * var(--k) + 0.3rem);
+}
+
+.inv-item--con-cadenas {
+  --inf: 98;
+  --marco: var(--img-inv-con-cadenas);
+}
+
+/* La cadena cuelga por encima del marco siguiente: este sube (3px de
+   margen transparente del dibujo + --solape) y el marco con cadenas se
+   pinta delante, así la cadena se ve agarrada al borde de arriba. */
+.inv-item--con-cadenas {
+  z-index: 1;
+}
+
+.inv-item--con-cadenas + .inv-item {
+  margin-top: calc(-1 * (3 + var(--solape)) * var(--k));
+}
+
+.inv-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-style: solid;
+  border-color: transparent;
+  border-width: calc(var(--sup) * var(--k)) calc(var(--der) * var(--k)) calc(var(--inf) * var(--k))
+    calc(var(--izq) * var(--k));
+  border-image-source: var(--marco);
+  border-image-slice: var(--sup) var(--der) var(--inf) var(--izq) fill;
+  border-image-width: 1;
+  border-image-repeat: stretch;
+}
+
+.inv-item__contenido {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.inv-cartel {
+  width: calc(399 * var(--k) * var(--escala-cartel));
+  max-width: 100%;
+  aspect-ratio: 399 / 145;
+}
+
+.inv-cartel:not(:first-child) {
+  margin-top: 0.7rem;
+}
+
+.inv-cartel img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media (max-width: 480px) {
+  .inv-item__contenido {
+    gap: 0.5rem;
+  }
 }
 
 .fila__cantidad {
@@ -733,7 +868,7 @@
   }
 
   .lista-scroll--inventario {
-    max-height: min(46vh, 26rem);
+    max-height: min(70vh, 44rem);
   }
 
   .lista-scroll--crafteo {

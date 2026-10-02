@@ -1,6 +1,7 @@
 # PanasRPG
 proyecto no sql 
 
+
 ```
 www
 ├─ conexion github.txt
@@ -108,6 +109,12 @@ www
 │  │  └─ menus
 │  │     ├─ general
 │  │     │  ├─ Cartel Mercado PNG.png
+│  │     │  ├─ Cartel_inventario_armaduras.png
+│  │     │  ├─ Cartel_inventario_armas.png
+│  │     │  ├─ Cartel_inventario_materiales.png
+│  │     │  ├─ Cartel_inventario_pociones.png
+│  │     │  ├─ inventario_marco_con_cadenas.png
+│  │     │  ├─ inventario_marco_sin_cadenas.png
 │  │     │  ├─ Marco_enemigos_ajedrez.png
 │  │     │  ├─ Marco_enemigos_bosque.png
 │  │     │  ├─ Marco_enemigos_cueva.png

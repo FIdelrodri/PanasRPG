@@ -15,6 +15,13 @@
   const URL_INICIO = '../Menus/inicio/inicio.html'; // relativa a Vistas_generales/
   const RUTA_ITEMS = '../../assets/Items/'; // relativa a Vistas_generales/
   const ITEM_SIN_ASSET = '404_item';
+  const RUTA_CARTELES = '../../imagenes/menus/general/'; // relativa a Vistas_generales/
+  const CARTELES = {
+    armas: 'Cartel_inventario_armas.png',
+    armaduras: 'Cartel_inventario_armaduras.png',
+    pociones: 'Cartel_inventario_pociones.png',
+    materiales: 'Cartel_inventario_materiales.png',
+  };
 
   const ARMAS = {
     sword: 'Espada',
@@ -390,23 +397,44 @@
     }
   }
 
-  function filaInventario(item) {
+  // Cada objeto va dentro de un marco. Los marcos "con cadenas" cuelgan hacia
+  // el siguiente; el último de cada grupo usa el marco "sin cadenas".
+  function filaInventario(item, esUltimo) {
     return el(
       'li',
-      { class: 'fila' },
-      iconoItem(item.id, item.nombre, 'icono-item fila__icono'),
+      { class: `inv-item ${esUltimo ? 'inv-item--sin-cadenas' : 'inv-item--con-cadenas'}` },
       el(
         'div',
-        { class: 'fila__principal' },
-        el('span', { class: 'fila__nombre' }, item.nombre),
-        item.detalle && el('span', { class: 'fila__detalle' }, item.detalle)
-      ),
-      el(
-        'div',
-        { class: 'fila__lado' },
-        item.equipado && el('span', { class: 'fila__marca' }, 'Equipado'),
-        item.cantidad != null && el('span', { class: 'fila__cantidad' }, `×${numero(item.cantidad)}`)
+        { class: 'inv-item__contenido' },
+        iconoItem(item.id, item.nombre, 'icono-item fila__icono'),
+        el(
+          'div',
+          { class: 'fila__principal' },
+          el('span', { class: 'fila__nombre' }, item.nombre),
+          item.detalle && el('span', { class: 'fila__detalle' }, item.detalle)
+        ),
+        el(
+          'div',
+          { class: 'fila__lado' },
+          item.equipado && el('span', { class: 'fila__marca' }, 'Equipado'),
+          item.cantidad != null && el('span', { class: 'fila__cantidad' }, `×${numero(item.cantidad)}`)
+        )
       )
+    );
+  }
+
+  // Cartel que abre cada categoría (y separa una de otra en "Todo").
+  function cartelInventario(categoriaId) {
+    const cat = CATEGORIAS.find((c) => c.id === categoriaId);
+    return el(
+      'li',
+      { class: 'inv-cartel' },
+      el('img', {
+        src: `${RUTA_CARTELES}${CARTELES[categoriaId]}`,
+        alt: cat.nombre,
+        loading: 'lazy',
+        decoding: 'async',
+      })
     );
   }
 
@@ -441,17 +469,27 @@
       items = [...items].sort((a, b) => ordenCategoria(a.categoria) - ordenCategoria(b.categoria) || porNombre(a, b));
     }
 
-    const lista = el('ul', { class: 'lista' });
-    const agrupar = estado.ordenInv === 'categoria' && estado.filtroInv === 'todo';
-    let anterior = null;
+    // Con cartel solo cuando las categorías no se mezclan: filtrando una
+    // categoría, o en "Todo" ordenado por categoría. Ordenando por nombre o
+    // cantidad en "Todo" es una sola tira de marcos sin carteles.
+    const conCarteles = estado.filtroInv !== 'todo' || estado.ordenInv === 'categoria';
 
+    const grupos = [];
     for (const item of items) {
-      if (agrupar && item.categoria !== anterior) {
-        const cat = CATEGORIAS.find((c) => c.id === item.categoria);
-        lista.append(el('li', { class: 'lista__grupo' }, cat.nombre));
-        anterior = item.categoria;
+      const ultimo = grupos[grupos.length - 1];
+      if (conCarteles && ultimo && ultimo.categoria === item.categoria) {
+        ultimo.items.push(item);
+      } else if (!conCarteles && ultimo) {
+        ultimo.items.push(item);
+      } else {
+        grupos.push({ categoria: conCarteles ? item.categoria : null, items: [item] });
       }
-      lista.append(filaInventario(item));
+    }
+
+    const lista = el('ul', { class: 'lista inv' });
+    for (const grupo of grupos) {
+      if (grupo.categoria) lista.append(cartelInventario(grupo.categoria));
+      grupo.items.forEach((item, i) => lista.append(filaInventario(item, i === grupo.items.length - 1)));
     }
     cont.append(lista);
   }

@@ -29,6 +29,12 @@
   --img-marco-dragones: url('../../imagenes/menus/general/Marco_enemigos_dragones.png');
   --img-marco-ajedrez: url('../../imagenes/menus/general/Marco_enemigos_ajedrez.png');
 
+  /* Marcos del inventario (Inventario). Medidas del dibujo en Main_game.css
+     (.inv-item). El de cadenas cuelga hacia el siguiente objeto; el de sin
+     cadenas cierra cada grupo. */
+  --img-inv-con-cadenas: url('../../imagenes/menus/general/inventario_marco_con_cadenas.png');
+  --img-inv-sin-cadenas: url('../../imagenes/menus/general/inventario_marco_sin_cadenas.png');
+
   /* ---- Colores ---- */
   --noche: #15222c;
   --noche-honda: #0e1820;
