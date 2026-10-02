@@ -11,7 +11,7 @@
      Están en "none" (sin imagen). Para usar una, reemplazar por:
        --img-fondo-menu: url('../../imagenes/Fondos/fondo_login.png');
      Las rutas son relativas a este archivo (Vistas/Vistas_generales/). */
-  --img-fondo-menu: none; /* fondo de Main_game.html */
+  --img-fondo-menu: url('../../imagenes/Fondos/Main_menu.jpg'); /* fondo de Main_game.html */
   --img-fondo-batalla: none; /* fondo de Main_batalla.html */
   --img-panel: none; /* fondo de cada panel */
   --img-encabezado: none; /* barra superior de la cuenta */
