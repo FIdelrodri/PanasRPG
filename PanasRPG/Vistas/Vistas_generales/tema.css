@@ -45,6 +45,11 @@
      9-slice; las medidas del dibujo están en Main_game.css (.opcion). */
   --img-marco-item-equipo: url('../../imagenes/menus/general/Marco_items_equipo.png');
 
+  /* Contenedor gris compartido (Equipo, Inventario y Combate): cuadrado, sin
+     línea dorada. --opacidad-grupo regula cuánto se ve el fondo detrás. */
+  --gris-grupo: 74 78 84;
+  --opacidad-grupo: 0.8;
+
   /* ---- Colores ---- */
   --noche: #15222c;
   --noche-honda: #0e1820;

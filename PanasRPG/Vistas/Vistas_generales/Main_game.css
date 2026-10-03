@@ -8,12 +8,19 @@
 }
 
 .vista-menu {
-  background-image: var(--img-fondo-menu);
-  background-size: cover;
-  background-position: center;
-  padding-bottom: calc(4.25rem + env(safe-area-inset-bottom, 0px));
+  background-color: #0e1820;   /* color de respaldo mientras carga la imagen */
 }
 
+.vista-menu::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;                 /* queda detrás de todo el contenido */
+  background-image: var(--img-fondo-menu);
+  background-size: cover;      /* llena la pantalla sin deformarse */
+  background-position: center;
+  background-repeat: no-repeat;
+}
 /* ---------- Cuenta ---------- */
 
 .cuenta {
@@ -251,12 +258,14 @@
 
 .pestanas {
   display: flex;
+  overflow-x: auto; /* en pantallas angostas "Crafteo" se desliza en vez de cortarse */
   gap: 0.25rem;
   padding: 0 1.1rem;
   border-bottom: 1px solid var(--borde);
 }
 
 .pestana {
+  flex: 0 0 auto;
   min-height: var(--alto-toque);
   padding: 0.4rem 1rem;
   border: 0;
@@ -350,6 +359,10 @@
 
 .mercado__item .boton {
   margin-top: auto;
+}
+
+.buscador-barra {
+  border-bottom: 1px solid var(--borde);
 }
 
 .buscador {
@@ -535,10 +548,8 @@
 }
 
 /* Contenedor de cada grupo: gris al 80 %, sin línea dorada y sin esquinas
-   redondeadas. Para cambiar la intensidad, tocar --opacidad-grupo. */
+   redondeadas. Para cambiar la intensidad, tocar --opacidad-grupo (tema.css). */
 .grupo {
-  --gris-grupo: 74 78 84;
-  --opacidad-grupo: 0.8;
   padding: 0.85rem 1rem 1rem;
   background-color: rgb(var(--gris-grupo) / var(--opacidad-grupo));
   border: 1px solid rgb(255 255 255 / 0.12);
@@ -664,34 +675,53 @@
   font-size: 0.8125rem;
 }
 
-/* ---------- Inventario ---------- */
+/* ---------- Inventario y Combate: controles arriba, lista en gris ---------- */
 
-/* En Inventario el contenedor de la lista desaparece: los marcos quedan
-   directamente sobre el fondo de la pantalla. Igual que en Mundos, solo la
-   cabecera y los filtros conservan el fondo de panel (para que se lean). */
-.seccion--inventario {
+/* La sección no tiene fondo propio. Arriba quedan los controles en su placa
+   azul de siempre (cabecera, pestañas, filtros, buscador, barra del mercado)
+   y, separada por un espacio, la lista en sí (objetos, enemigos, bosses,
+   recetas, mercado) dentro del contenedor gris: 80 %, cuadrado y sin la línea
+   dorada. El gris sale de --gris-grupo / --opacidad-grupo (tema.css). */
+.seccion--inventario,
+.seccion--combate {
   background: none;
   border: 0;
 }
 
 .seccion--inventario > .panel__cabecera,
-.seccion--inventario > .filtros {
+.seccion--combate > .panel__cabecera,
+.seccion--combate > .pestanas,
+.seccion--inventario > .filtros,
+#panel-mundos > .filtros,
+.mercado__cabecera,
+.buscador-barra {
   background-color: var(--placa);
   border-right: 1px solid var(--borde);
   border-left: 1px solid var(--borde);
 }
 
-.seccion--inventario > .panel__cabecera {
+.seccion--inventario > .panel__cabecera,
+.seccion--combate > .panel__cabecera {
   border-top: 3px solid var(--laton);
   border-radius: 4px 16px 0 0;
 }
 
-.seccion--inventario .vacio {
-  margin-top: 0.5rem;
-  border: 1px solid var(--borde);
-  border-radius: var(--radio-chico);
-  background-color: var(--placa);
+/* Contenedor gris de la lista */
+.seccion--inventario .lista-scroll,
+.seccion--combate .lista-scroll,
+.seccion--combate .mercado {
+  margin-top: 1.25rem;
+  padding: 0.75rem;
+  background-color: rgb(var(--gris-grupo) / var(--opacidad-grupo));
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 0;
 }
+
+.seccion--combate .mercado {
+  padding: 0.75rem;
+}
+
+/* ---------- Inventario ---------- */
 
 .lista-scroll--inventario {
   scrollbar-width: thin;
@@ -915,28 +945,6 @@
     min-width: 4.25rem;
     padding-inline: 0.7rem;
   }
-}
-
-/* En Mundos el contenedor de la lista desaparece: los marcos quedan
-   directamente sobre el fondo de la pantalla. El panel pierde su fondo y
-   su borde, y solo la cabecera, las pestañas y los botones de mundo
-   conservan el fondo de panel (para que se lean). */
-.seccion--combate:has(#panel-mundos:not([hidden])) {
-  background: none;
-  border: 0;
-}
-
-.seccion--combate:has(#panel-mundos:not([hidden])) > .panel__cabecera,
-.seccion--combate:has(#panel-mundos:not([hidden])) > .pestanas,
-#panel-mundos > .filtros {
-  background-color: var(--placa);
-  border-right: 1px solid var(--borde);
-  border-left: 1px solid var(--borde);
-}
-
-.seccion--combate:has(#panel-mundos:not([hidden])) > .panel__cabecera {
-  border-top: 3px solid var(--laton);
-  border-radius: 4px 16px 0 0;
 }
 
 .lista-scroll--combate {
