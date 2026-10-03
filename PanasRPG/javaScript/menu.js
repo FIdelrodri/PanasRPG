@@ -161,7 +161,7 @@
 
     $('cuenta-nombre').textContent = u.username;
     $('cuenta-nivel').textContent = u.level;
-    $('cuenta-oro').textContent = `Oro: ${numero(u.gold || 0)}`;
+    $('cuenta-oro').textContent = numero(u.gold || 0); // el rótulo "Oro:" ya está dibujado en el marco
 
     const maximo = u.xpToNext == null;
     const porcentaje = maximo ? 100 : Math.max(0, Math.min(100, (u.xp / u.xpToNext) * 100));
@@ -173,7 +173,7 @@
 
     $('xp-texto').textContent = maximo
       ? 'Nivel máximo'
-      : `${numero(u.xp)} / ${numero(u.xpToNext)} de experiencia para el nivel ${u.level + 1}`;
+      : `${numero(u.xp)} / ${numero(u.xpToNext)} XP`;
   }
 
   // -------------------------------------------------------------------- equipo

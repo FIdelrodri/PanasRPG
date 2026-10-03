@@ -11,22 +11,30 @@
 
   <!-- ===== Cuenta ===== -->
   <header class="cuenta">
-    <div class="insignia" role="img" aria-label="Nivel">
-      <span class="insignia__rotulo">Nivel</span>
-      <span class="insignia__numero" id="cuenta-nivel">–</span>
-    </div>
+    <!-- Marco de info del usuario: cada dato se posiciona sobre su hueco del dibujo (ver Main_game.css) -->
+    <div class="marco-usuario">
+      <div class="marco-usuario__nivel" role="img" aria-label="Nivel">
+        <span class="marco-usuario__nivel-rotulo">Nivel</span>
+        <span class="marco-usuario__nivel-numero" id="cuenta-nivel">–</span>
+      </div>
 
-    <div class="cuenta__datos">
-      <p class="cuenta__nombre" id="cuenta-nombre">Cargando…</p>
+      <p class="marco-usuario__nombre" id="cuenta-nombre">Cargando…</p>
+
       <div class="xp" id="xp" role="progressbar" aria-label="Experiencia hasta el próximo nivel"
            aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         <div class="xp__relleno" id="xp-relleno"></div>
       </div>
+
       <p class="xp__texto" id="xp-texto"></p>
-      <p class="cuenta__oro" id="cuenta-oro"></p>
+
+      <p class="marco-usuario__oro">
+        <span class="sr-only">Oro: </span><span id="cuenta-oro">0</span>
+      </p>
     </div>
 
-    <button type="button" class="boton boton--sutil" id="btn-logout">Cerrar sesión</button>
+    <button type="button" class="boton-logout" id="btn-logout">
+      <span class="sr-only">Cerrar sesión</span>
+    </button>
   </header>
 
   <main class="menu" id="contenido">

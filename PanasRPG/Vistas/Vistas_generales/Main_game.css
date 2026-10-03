@@ -18,66 +18,99 @@
 
 .cuenta {
   display: flex;
-  align-items: center;
-  gap: 0.9rem;
-  padding: 0.8rem 1rem;
-  background-color: var(--noche-honda);
-  background-image: var(--img-encabezado);
-  background-size: cover;
-  border-bottom: 1px solid var(--borde);
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.6rem 1rem;
+  padding: 0.8rem 1rem 0;
 }
 
-.cuenta__datos {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  gap: 0.3rem;
+/*
+  Marco de información del usuario (Marco_Info_usuario.png, 1024 × 180 px).
+  El dibujo manda el tamaño: el contenedor conserva la proporción del PNG y
+  cada dato es un hijo posicionado en % sobre su hueco. Las medidas salen de
+  los píxeles del dibujo original:
+
+      left = x / 1024      top = y / 180      width = ancho / 1024      height = alto / 180
+
+  Huecos (px del PNG):
+    nivel   (escudo, zona clara) x  90–146   y  49–125
+    nombre  (placa superior)     x 196–440   y  31–61
+    XP      (ranura negra)       x 197–890   y  70–89
+    texto XP (losa musgosa)      x 195–615   y  95–125
+    oro     (cajón, tras "Oro:") x 258–455   y 141–167
+
+  Los tamaños de letra usan cqw (% del ancho del marco) para que el texto
+  crezca y encoja junto con el dibujo.
+*/
+.marco-usuario {
+  position: relative;
+  flex: 0 0 auto;
+  width: 100%;
+  aspect-ratio: 1024 / 180;
+  container-type: inline-size;
+  background-image: var(--img-marco-usuario);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  filter: drop-shadow(0 4px 8px rgb(0 0 0 / 0.55));
+}
+
+.marco-usuario > * {
+  position: absolute;
+  margin: 0;
   min-width: 0;
 }
 
-.cuenta__nombre {
-  font: 700 1.3rem/1.2 var(--fuente-titulo);
-  overflow-wrap: anywhere;
-}
-
-.cuenta .boton {
-  flex: 0 0 auto;
-  padding-inline: 0.8rem;
-  font-size: 0.875rem;
-}
-
-/* Escudo del nivel: el único elemento "decorado" de la pantalla */
-.insignia {
+/* Escudo del nivel */
+.marco-usuario__nivel {
+  left: 8.8%;
+  top: 27%;
+  width: 5.4%;
+  height: 42%;
   display: flex;
-  flex: 0 0 auto;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 3.5rem;
-  height: 4.1rem;
-  padding-bottom: 0.4rem;
-  background-color: var(--laton);
-  background-image: var(--img-insignia);
-  background-size: 100% 100%;
-  clip-path: polygon(50% 0, 100% 12%, 100% 62%, 50% 100%, 0 62%, 0 12%);
-  color: var(--tinta-sobre-laton);
+  gap: 4%;
+  color: #2b261b;
+  text-align: center;
 }
 
-.insignia__rotulo {
-  font-size: 0.625rem;
-  font-weight: 600;
-  line-height: 1;
+.marco-usuario__nivel-rotulo {
+  font: 700 1.15cqw/1 var(--fuente-titulo);
+  letter-spacing: 0;
+  text-transform: uppercase;
 }
 
-.insignia__numero {
-  font: 700 1.55rem/1.05 var(--fuente-titulo);
+.marco-usuario__nivel-numero {
+  font: 700 3.6cqw/1 var(--fuente-titulo);
 }
 
-.xp {
-  height: 0.7rem;
+/* Nombre */
+.marco-usuario__nombre {
+  left: 19.1%;
+  top: 17.2%;
+  width: 23.8%;
+  height: 16.7%;
+  display: flex;
+  align-items: center;
+  padding-inline: 1.2%;
   overflow: hidden;
-  background-color: #0b1218;
-  border: 1px solid var(--borde);
+  color: #231f16;
+  font: 700 2.7cqw/1 var(--fuente-titulo);
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.25);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Ranura de XP: la barra verde vive dentro del hueco negro del dibujo */
+.xp {
+  left: 19.2%;
+  top: 39.4%;
+  width: 67.7%;
+  height: 9.6%;
+  overflow: hidden;
+  background-color: #05080b;
   border-radius: 2px;
 }
 
@@ -85,18 +118,74 @@
   width: 0;
   height: 100%;
   background-color: var(--musgo);
+  background-image: linear-gradient(rgb(255 255 255 / 0.28), rgb(255 255 255 / 0) 55%, rgb(0 0 0 / 0.25));
   transition: width 0.5s;
 }
 
-.cuenta__oro {
-  color: var(--laton);
-  font-size: 0.875rem;
-  font-weight: 600;
+/* Texto de XP sobre la losa musgosa */
+.xp__texto {
+  left: 19%;
+  top: 52.8%;
+  width: 41%;
+  height: 16.7%;
+  display: flex;
+  align-items: center;
+  padding-inline: 1.2%;
+  overflow: hidden;
+  color: #f1ecd9;
+  font: 600 2.6cqw/1 var(--fuente-texto);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.8);
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.xp__texto {
-  color: var(--texto-suave);
-  font-size: 0.8125rem;
+/* Oro: el rótulo "Oro:" ya está dibujado, acá va solo la cifra */
+.marco-usuario__oro {
+  left: 25.2%;
+  top: 78.3%;
+  width: 19.2%;
+  height: 14.4%;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  color: var(--laton);
+  font: 700 2.7cqw/1 var(--fuente-titulo);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.9);
+  white-space: nowrap;
+}
+
+/* Botón de cerrar sesión (Boton_cerrar_sesion.png, 1024 × 381 px).
+   El PNG tiene margen transparente: lo recorto con background-size/position
+   para que el botón mida lo que se ve (zona visible: x 114–913, y 23–350)
+   y no haya área "clickeable" fantasma alrededor. */
+.boton-logout {
+  flex: 0 0 auto;
+  width: 9rem;
+  margin-left: auto;
+  aspect-ratio: 800 / 328;
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+  background-image: var(--img-boton-logout);
+  background-repeat: no-repeat;
+  background-size: 128% auto;
+  background-position: 50.9% 43.4%;
+  cursor: pointer;
+  filter: drop-shadow(0 3px 6px rgb(0 0 0 / 0.55));
+  transition: filter 0.15s, transform 0.15s;
+}
+
+.boton-logout:hover {
+  filter: drop-shadow(0 3px 6px rgb(0 0 0 / 0.55)) brightness(1.15);
+}
+
+.boton-logout:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.boton-logout:focus-visible {
+  outline: 2px solid var(--laton);
+  outline-offset: 3px;
 }
 
 /* ---------- Estructura ---------- */
@@ -825,16 +914,16 @@
   }
 
   .cuenta {
-    padding: 0.9rem clamp(1rem, 3vw, 2rem);
+    flex-wrap: nowrap;
+    padding: 0.9rem clamp(1rem, 3vw, 2rem) 0;
   }
 
-  .cuenta__datos {
-    flex: 0 1 30rem;
+  .marco-usuario {
+    width: clamp(28rem, 42vw, 42rem);
   }
 
-  .cuenta .boton {
-    margin-left: auto;
-    font-size: 1rem;
+  .boton-logout {
+    width: 12rem;
   }
 
   .menu {

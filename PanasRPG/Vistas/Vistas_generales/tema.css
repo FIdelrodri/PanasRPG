@@ -35,6 +35,12 @@
   --img-inv-con-cadenas: url('../../imagenes/menus/general/inventario_marco_con_cadenas.png');
   --img-inv-sin-cadenas: url('../../imagenes/menus/general/inventario_marco_sin_cadenas.png');
 
+  /* Marco de información del usuario (arriba a la izquierda) y botón de
+     cerrar sesión. Medidas de los huecos del marco en Main_game.css
+     (.marco-usuario). Si se cambia el dibujo, ajustar ahí los números. */
+  --img-marco-usuario: url('../../imagenes/menus/general/Marco_Info_usuario.png');
+  --img-boton-logout: url('../../imagenes/menus/general/Boton_cerrar_sesion.png');
+
   /* ---- Colores ---- */
   --noche: #15222c;
   --noche-honda: #0e1820;
