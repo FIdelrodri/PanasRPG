@@ -511,12 +511,42 @@
 
 /* ---------- Equipo ---------- */
 
-.grupo + .grupo {
-  margin-top: 1.1rem;
+/* Igual que en Inventario, el contenedor único de la sección desaparece:
+   cada grupo (Arma, Armadura, Pociones) tiene su propio contenedor y entre
+   ellos queda un espacio donde se ve el fondo de la pantalla. La cabecera
+   "Equipo" también pasa a ser una placa suelta. */
+.seccion--equipo {
+  background: none;
+  border: 0;
+}
+
+.seccion--equipo > .panel__cabecera {
+  background-color: var(--placa);
+  border: 1px solid var(--borde);
+  border-top: 3px solid var(--laton);
+  border-radius: var(--radio-panel);
+}
+
+.seccion--equipo > .panel__cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.25rem 0 0;
+}
+
+/* Contenedor de cada grupo: gris al 80 %, sin línea dorada y sin esquinas
+   redondeadas. Para cambiar la intensidad, tocar --opacidad-grupo. */
+.grupo {
+  --gris-grupo: 74 78 84;
+  --opacidad-grupo: 0.8;
+  padding: 0.85rem 1rem 1rem;
+  background-color: rgb(var(--gris-grupo) / var(--opacidad-grupo));
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 0;
 }
 
 .grupo__titulo {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.6rem;
   font: 700 1.0625rem/1.3 var(--fuente-titulo);
 }
 
@@ -526,24 +556,63 @@
   font: 400 0.875rem/1 var(--fuente-texto);
 }
 
-.opciones {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
-  gap: 0.5rem;
+.grupo .vacio {
+  margin: 0;
 }
 
+.opciones {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.35rem;
+}
+
+/* Cada objeto va dentro de Marco_items_equipo.png (1024 × 424 px) dibujado
+   con "border-image" (9-slice): las esquinas con adornos no se deforman y solo
+   se estira el centro negro.
+
+   Medidas en píxeles de la imagen original:
+     --sup / --inf   200 / 200  alto de las esquinas (incluye los adornos)
+     --izq / --der   250 / 250  ancho de las esquinas (incluye los adornos)
+   El dibujo tiene ~30px de margen transparente alrededor y el borde de metal
+   llega hasta x 71 · 961, y 62 · 360 (interior negro liso).
+   --k es la escala: 0.3 → el marco más chico mide 150 × 120 px. */
 .opcion {
+  --sup: 200;
+  --izq: 250;
+  --der: 250;
+  --inf: 200;
+  --k: 0.3px;
+  position: relative;
+  isolation: isolate;
+  box-sizing: border-box;
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 0.6rem;
-  min-height: var(--alto-toque);
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--borde);
-  border-radius: var(--radio-chico);
-  background-color: var(--placa-alta);
+  min-height: calc(400 * var(--k));
+  padding: calc(70 * var(--k) + 0.1rem) calc(85 * var(--k)) calc(70 * var(--k) + 0.1rem) calc(95 * var(--k));
+  border: 0;
+  background: none;
+  color: var(--texto);
   text-align: left;
   cursor: pointer;
+}
+
+.opcion::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-style: solid;
+  border-color: transparent;
+  border-width: calc(var(--sup) * var(--k)) calc(var(--der) * var(--k)) calc(var(--inf) * var(--k))
+    calc(var(--izq) * var(--k));
+  border-image-source: var(--img-marco-item-equipo);
+  border-image-slice: var(--sup) var(--der) var(--inf) var(--izq) fill;
+  border-image-width: 1;
+  border-image-repeat: stretch;
+  transition: filter 0.15s;
 }
 
 .opcion__texto {
@@ -553,14 +622,31 @@
   min-width: 0;
 }
 
-.opcion:hover:not(:disabled) {
-  border-color: var(--borde-fuerte);
+/* Relleno negro bajo el interior del marco: tapa las costuras finas que deja
+   el 9-slice al escalar (queda debajo del dibujo, solo dentro del metal) */
+.opcion::after {
+  content: '';
+  position: absolute;
+  inset: calc(66 * var(--k)) calc(68 * var(--k)) calc(64 * var(--k)) calc(74 * var(--k));
+  z-index: -2;
+  pointer-events: none;
+  background-color: #000;
 }
 
+.opcion:hover:not(:disabled)::before {
+  filter: brightness(1.3);
+}
+
+.opcion:focus-visible {
+  outline: 2px solid var(--laton);
+  outline-offset: -4px;
+}
+
+/* Equipado: el marco brilla en latón (sin texto; el estado lo indica aria-pressed) */
+/* El brillo va en el botón entero (no en ::before): así el relleno negro tapa
+   el resplandor y no se filtra en las costuras del 9-slice. */
 .opcion[aria-pressed='true'] {
-  border-color: var(--laton);
-  box-shadow: inset 4px 0 0 var(--laton);
-  padding-left: 1rem;
+  filter: drop-shadow(0 0 3px var(--laton)) drop-shadow(0 0 7px var(--laton-oscuro));
 }
 
 .opcion:disabled {
@@ -576,12 +662,6 @@
 .opcion__detalle {
   color: var(--texto-suave);
   font-size: 0.8125rem;
-}
-
-.opcion__marca {
-  color: var(--laton);
-  font-size: 0.8125rem;
-  font-weight: 600;
 }
 
 /* ---------- Inventario ---------- */

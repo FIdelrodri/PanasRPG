@@ -193,8 +193,7 @@
         'span',
         { class: 'opcion__texto' },
         el('span', { class: 'opcion__titulo' }, titulo),
-        detalle && el('span', { class: 'opcion__detalle' }, detalle),
-        activa && el('span', { class: 'opcion__marca' }, 'Equipado')
+        detalle && el('span', { class: 'opcion__detalle' }, detalle)
       )
     );
   }

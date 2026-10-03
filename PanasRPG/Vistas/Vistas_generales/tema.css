@@ -41,6 +41,10 @@
   --img-marco-usuario: url('../../imagenes/menus/general/Marco_Info_usuario.png');
   --img-boton-logout: url('../../imagenes/menus/general/Boton_cerrar_sesion.png');
 
+  /* Marco de cada objeto en Equipo (arma / armadura / poción). Se estira con
+     9-slice; las medidas del dibujo están en Main_game.css (.opcion). */
+  --img-marco-item-equipo: url('../../imagenes/menus/general/Marco_items_equipo.png');
+
   /* ---- Colores ---- */
   --noche: #15222c;
   --noche-honda: #0e1820;

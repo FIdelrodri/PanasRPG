@@ -108,6 +108,7 @@ www
 │  │  │  └─ logo.png
 │  │  └─ menus
 │  │     ├─ general
+│  │     │  ├─ Boton_cerrar_sesion.png
 │  │     │  ├─ Cartel Mercado PNG.png
 │  │     │  ├─ Cartel_inventario_armaduras.png
 │  │     │  ├─ Cartel_inventario_armas.png
@@ -119,7 +120,8 @@ www
 │  │     │  ├─ Marco_enemigos_bosque.png
 │  │     │  ├─ Marco_enemigos_cueva.png
 │  │     │  ├─ Marco_enemigos_dragones.png
-│  │     │  └─ Marco_enemigos_nieve.png
+│  │     │  ├─ Marco_enemigos_nieve.png
+│  │     │  └─ Marco_Info_usuario.png
 │  │     ├─ inicio
 │  │     │  ├─ boton_login.png
 │  │     │  ├─ notienesunacuenta.png
@@ -280,7 +282,8 @@ www
 │  │     │  ├─ Marco_enemigos_cueva.png
 │  │     │  ├─ Marco_enemigos_dragones.png
 │  │     │  ├─ Marco_enemigos_nieve.png
-│  │     │  └─ Marco_Info_usuario.png
+│  │     │  ├─ Marco_Info_usuario.png
+│  │     │  └─ Marco_items_equipo.png
 │  │     ├─ inicio
 │  │     │  ├─ boton_login.png
 │  │     │  ├─ notienesunacuenta.png
