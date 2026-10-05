@@ -1060,3 +1060,159 @@
     bottom: 1.5rem;
   }
 }
+
+/* =====================================================================
+   Cabeceras: estilo "Madera y cadenas"
+   ---------------------------------------------------------------------
+   Afecta SOLO a: cabecera de Equipo, cabecera + pestañas + mundos de
+   Combate, y cabecera + filtros de Inventario. Los contenedores grises
+   de abajo no se tocan. Para cambiar colores, editar las variables.
+   ===================================================================== */
+
+:root {
+  --madera: #6a4426;
+  --madera-veta: #5d3b20;
+  --madera-clara: #8a5d2f;
+  --madera-oscura: #3a2312;
+  --madera-negra: #2a170a;
+  --contorno: #1a0e06;
+  --oro-madera: #ffdf94;
+}
+
+/* Cabecera: tablón colgado de dos cadenas */
+.seccion--equipo > .panel__cabecera,
+.seccion--inventario > .panel__cabecera,
+.seccion--combate > .panel__cabecera {
+  position: relative;
+  padding: 0.85rem 1.4rem 0.7rem;
+  background: repeating-linear-gradient(90deg, var(--madera) 0 38px, var(--madera-veta) 38px 40px);
+  border: 3px solid var(--madera-negra);
+  border-radius: 2px;
+  box-shadow: inset 0 2px 0 #9a6b3f, inset 0 -3px 0 rgb(0 0 0 / 0.3);
+}
+
+/* Cabeceras que se unen con lo que tienen debajo (pestañas / filtros) */
+.seccion--inventario > .panel__cabecera,
+.seccion--combate > .panel__cabecera {
+  border-bottom: 0;
+}
+
+/* Cadenas que cuelgan del tablón */
+.seccion--equipo > .panel__cabecera::before,
+.seccion--equipo > .panel__cabecera::after,
+.seccion--inventario > .panel__cabecera::before,
+.seccion--inventario > .panel__cabecera::after,
+.seccion--combate > .panel__cabecera::before,
+.seccion--combate > .panel__cabecera::after {
+  content: '';
+  position: absolute;
+  top: -0.85rem;
+  width: 0.32rem;
+  height: 0.85rem;
+  background: repeating-linear-gradient(#9aa0a6 0 4px, #4a4e53 4px 6px);
+}
+
+.seccion--equipo > .panel__cabecera::before,
+.seccion--inventario > .panel__cabecera::before,
+.seccion--combate > .panel__cabecera::before {
+  left: 1.4rem;
+}
+
+.seccion--equipo > .panel__cabecera::after,
+.seccion--inventario > .panel__cabecera::after,
+.seccion--combate > .panel__cabecera::after {
+  right: 1.4rem;
+}
+
+/* Título dorado y nota */
+.seccion--equipo .panel__titulo,
+.seccion--inventario .panel__titulo,
+.seccion--combate .panel__titulo {
+  color: var(--oro-madera);
+  text-shadow: 1px 1px 0 #000;
+}
+
+.seccion--equipo .panel__nota,
+.seccion--inventario .orden {
+  color: #e3c79c;
+}
+
+/* Pestañas de Combate: tablillas de madera */
+.seccion--combate > .pestanas {
+  gap: 0.4rem;
+  padding: 0.6rem 1.1rem 0.7rem;
+  background: var(--madera-oscura);
+  border: 0;
+  border-right: 3px solid var(--madera-negra);
+  border-left: 3px solid var(--madera-negra);
+  border-bottom: 3px solid var(--madera-negra);
+  scrollbar-width: none;
+}
+
+.seccion--combate > .pestanas::-webkit-scrollbar {
+  display: none;
+}
+
+.seccion--combate .pestana {
+  min-height: 2.5rem;
+  padding: 0.35rem 1rem;
+  background: repeating-linear-gradient(90deg, var(--madera-veta) 0 30px, #52341b 30px 32px);
+  border: 2px solid var(--madera-negra);
+  border-radius: 2px;
+  color: #d9bf94;
+  box-shadow: inset 0 1px 0 #8a5d34, 0 3px 0 var(--contorno);
+}
+
+.seccion--combate .pestana[aria-selected='true'] {
+  background: repeating-linear-gradient(90deg, var(--madera-clara) 0 30px, #7c5229 30px 32px);
+  color: #fff0c4;
+  box-shadow: inset 0 1px 0 #c58f52, 0 1px 0 var(--contorno);
+  transform: translateY(2px);
+}
+
+/* Mundos (Combate) y categorías (Inventario): varias líneas, sin scroll lateral.
+   Mismos selectores que el bloque de "Inventario y Combate" para ganar en
+   especificidad. */
+.seccion--inventario > .filtros,
+#panel-mundos > .filtros,
+.mercado__cabecera,
+.buscador-barra {
+  background: var(--madera-oscura);
+  border-right: 3px solid var(--madera-negra);
+  border-left: 3px solid var(--madera-negra);
+  border-bottom: 3px solid var(--madera-negra);
+}
+
+.seccion--inventario > .filtros,
+#panel-mundos > .filtros {
+  flex-wrap: wrap;
+  overflow-x: visible;
+  gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+}
+
+.seccion--combate .filtro,
+.seccion--inventario .filtro {
+  background: var(--madera-negra);
+  border: 2px solid var(--contorno);
+  border-radius: 2px;
+  color: #d9bf94;
+}
+
+.seccion--combate .filtro[aria-pressed='true'],
+.seccion--inventario .filtro[aria-pressed='true'] {
+  background: var(--laton);
+  color: var(--madera-negra);
+}
+
+.seccion--combate .filtro__cuenta,
+.seccion--inventario .filtro__cuenta {
+  color: inherit;
+  opacity: 0.7;
+}
+
+.seccion--inventario .orden select {
+  background-color: var(--madera-negra);
+  border: 2px solid var(--contorno);
+  border-radius: 2px;
+}
