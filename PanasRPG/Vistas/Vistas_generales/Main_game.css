@@ -29,9 +29,30 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.6rem 1rem;
-  padding: 0.8rem 1rem 0;
+  padding: 0.8rem 1rem 0; 
+   position: relative;
+  isolation: isolate; 
 }
 
+.cuenta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--sombra-superior-alto);
+  z-index: -1;
+  pointer-events: none;  /* no bloquea clics */
+  background: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / var(--sombra-superior-opacidad)) 0%,
+    rgb(0 0 0 / var(--sombra-superior-opacidad)) 55%,   /* negro parejo hasta acá */
+    rgb(0 0 0 / calc(var(--sombra-superior-opacidad) * 0.7)) 70%,
+    rgb(0 0 0 / calc(var(--sombra-superior-opacidad) * 0.4)) 82%,
+    rgb(0 0 0 / calc(var(--sombra-superior-opacidad) * 0.12)) 92%,
+    rgb(0 0 0 / 0) 100%                                  /* transparente al final */
+  );
+}
 /*
   Marco de información del usuario (Marco_Info_usuario.png, 1024 × 180 px).
   El dibujo manda el tamaño: el contenedor conserva la proporción del PNG y

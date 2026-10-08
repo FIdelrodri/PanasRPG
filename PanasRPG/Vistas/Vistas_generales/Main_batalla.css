@@ -1,4 +1,7 @@
 .vista-batalla {
+  /* Unidad de escala: crece con la pantalla pero sin pasarse de alto (referencia 16:9).
+     1280x720 -> 12.8px, 1920x1080 -> 19.2px. Todo lo de la arena se mide en multiplos de --esc. */
+  --esc: min(1vw, 1.7778vh);
   min-height: 100vh;
   overflow-x: hidden;
   background-color: #18222a;
@@ -53,8 +56,8 @@
   grid-template-rows: auto 1fr auto;
   align-items: end;
   gap: 0.5rem;
-  width: min(100%, 76rem);
-  min-height: min(72vh, 46rem);
+  width: min(100%, calc(var(--esc) * 95));
+  min-height: 72vh;
   margin: 0 auto;
   padding: clamp(1rem, 4vw, 3rem) clamp(0.75rem, 5vw, 4rem) 2rem;
   isolation: isolate;
@@ -103,8 +106,9 @@
   --ranura-alto: 12.75%;
   position: relative;
   z-index: 1;
-  width: min(100%, 26rem);
+  width: min(100%, max(15rem, calc(var(--esc) * 32.5)));
   aspect-ratio: 1024 / 251;
+  container-type: inline-size;
   filter: drop-shadow(0 0.4rem 0.8rem rgba(0, 0, 0, 0.45));
 }
 
@@ -160,7 +164,7 @@
   align-items: center;
   overflow: hidden;
   color: #f4e6c4;
-  font: 700 clamp(0.75rem, 2.6vw, 1.15rem)/1 var(--fuente-titulo);
+  font: 700 max(0.7rem, 4.4cqw)/1 var(--fuente-titulo);
   text-shadow: 0 2px 0 #000, 0 0 6px #000;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -177,7 +181,7 @@
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-size: clamp(0.55rem, 1.8vw, 0.85rem);
+  font-size: max(0.55rem, 3.3cqw);
   font-weight: 800;
   text-shadow: 0 1px 0 #000, 1px 0 0 #000, -1px 0 0 #000, 0 -1px 0 #000;
   pointer-events: none;
@@ -187,8 +191,8 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: clamp(7rem, 29vw, 19rem);
-  height: clamp(10rem, 43vw, 27rem);
+  width: clamp(7rem, calc(var(--esc) * 23.75), 80rem);
+  height: clamp(10rem, calc(var(--esc) * 33.75), 115rem);
   transform-origin: 50% 90%;
   animation: balanceo 2.6s ease-in-out infinite;
   filter: drop-shadow(0 1rem 0.9rem rgba(0, 0, 0, 0.55));
@@ -211,7 +215,7 @@
   border-radius: 48% 48% 28% 28%;
   background: linear-gradient(145deg, rgba(84, 104, 111, 0.94), rgba(25, 35, 40, 0.96));
   color: #f8eac9;
-  font: 700 clamp(1rem, 4vw, 1.7rem) var(--fuente-titulo);
+  font: 700 clamp(1rem, calc(var(--esc) * 1.8), 4rem) var(--fuente-titulo);
   text-align: center;
   text-shadow: 0 2px 5px #000;
 }
@@ -247,7 +251,7 @@
   grid-row: 2;
   align-self: center;
   color: rgba(255, 244, 215, 0.8);
-  font: 700 clamp(1.2rem, 4vw, 2.4rem) var(--fuente-titulo);
+  font: 700 clamp(1.2rem, calc(var(--esc) * 3), 7rem) var(--fuente-titulo);
   text-shadow: 0 3px 8px #000;
 }
 
@@ -256,7 +260,8 @@
   grid-row: 3;
   justify-self: center;
   max-width: 90%;
-  padding: 0.55rem 1rem;
+  padding: 0.55em 1em;
+  font-size: clamp(0.95rem, calc(var(--esc) * 1.25), 3rem);
   border: 1px solid rgba(239, 230, 205, 0.3);
   border-radius: 999px;
   background: rgba(12, 19, 23, 0.82);
@@ -271,6 +276,7 @@
   top: 1rem;
   left: 50%;
   transform: translateX(-50%);
+  font-size: clamp(0.875rem, calc(var(--esc) * 1.2), 2.4rem);
   box-shadow: 0 0.3rem 1rem rgba(0, 0, 0, 0.4);
 }
 
@@ -278,7 +284,7 @@
   position: absolute;
   z-index: 2;
   color: #fff;
-  font-size: clamp(1.2rem, 4vw, 2rem);
+  font-size: clamp(1.2rem, calc(var(--esc) * 2.5), 5rem);
   font-weight: 900;
   pointer-events: none;
   text-shadow: 0 2px 2px #000, 0 0 8px #000;
@@ -287,7 +293,7 @@
 
 .danio-flotante--critico {
   color: #ffe27b;
-  font-size: clamp(1.45rem, 5vw, 2.5rem);
+  font-size: clamp(1.45rem, calc(var(--esc) * 3.1), 6.2rem);
 }
 
 .danio-flotante--esquiva {
@@ -552,7 +558,7 @@
   }
 
   .arena {
-    min-height: min(78vh, 52rem);
+    min-height: 78vh;
   }
 }
 

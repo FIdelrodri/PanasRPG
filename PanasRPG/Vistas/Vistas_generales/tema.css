@@ -17,6 +17,10 @@
   --img-encabezado: none; /* barra superior de la cuenta */
   --img-boton: none; /* botones principales (Pelear, etc.) */
   --img-insignia: none; /* escudo del nivel */
+    /* Sombreado superior (detrás de la barra de usuario y el botón de cerrar sesión) */
+    /* Franja negra superior (detrás de la barra de usuario y el botón de cerrar sesión) */
+  --sombra-superior-opacidad: 0.9;  /* 0 = sin sombra · 1 = negro total */
+  --sombra-superior-alto: 17.5rem;   /* alto total de la franja, incluida la parte que se disuelve */
 
   /* Marcos de la lista de enemigos, uno por mundo (Combate > Mundos).
      Cada marco se estira con 9-slice: las medidas de cada uno están en
