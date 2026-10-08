@@ -200,6 +200,46 @@
     mostrarResultado(resultado);
   }
 
+  const RUTA_ITEMS = '../../assets/Items/';
+  const RUTA_MARCOS = '../../imagenes/menus/batalla/';
+
+  // Candidatos de archivo para un drop: id del item, luego el nombre, y por ultimo 404_item.png
+  function rutasItem(drop) {
+    const sinTildes = (t) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const slug = (t) => String(t).trim().toLowerCase().replace(/\s+/g, '_');
+    const candidatos = [drop.itemId, drop.id, drop.item_id, drop.materialId, drop.name]
+      .filter(Boolean)
+      .flatMap((v) => [slug(v), sinTildes(slug(v))]);
+    return [...new Set(candidatos)].map((c) => `${RUTA_ITEMS}${c}.png`).concat(`${RUTA_ITEMS}404_item.png`);
+  }
+
+  function tarjetaItem(drop) {
+    const celda = document.createElement('div');
+    celda.className = 'botin__item';
+    celda.title = drop.name;
+    const caja = document.createElement('div');
+    caja.className = 'botin__item-imagen';
+    const img = document.createElement('img');
+    img.alt = '';
+    const rutas = rutasItem(drop);
+    let i = 0;
+    img.onerror = () => {
+      i += 1;
+      if (i < rutas.length) img.src = rutas[i];
+      else img.hidden = true;
+    };
+    img.src = rutas[0];
+    const cant = document.createElement('span');
+    cant.className = 'botin__item-cantidad';
+    cant.textContent = `×${numero(drop.cantidad)}`;
+    caja.append(img, cant);
+    const nombre = document.createElement('span');
+    nombre.className = 'botin__item-nombre';
+    nombre.textContent = drop.name;
+    celda.append(caja, nombre);
+    return celda;
+  }
+
   function lineaBotin(etiqueta, valor) {
     const linea = document.createElement('div');
     linea.className = 'botin__linea';
@@ -234,15 +274,19 @@
         lineaBotin('Experiencia', `+${numero(recompensas.xp)} XP`),
         lineaBotin('Oro', `+${numero(recompensas.oro)}`)
       );
-      if (recompensas.drops.length) {
-        for (const drop of recompensas.drops) {
-          botin.append(lineaBotin(drop.name, `×${numero(drop.cantidad)}`));
-        }
-      } else if (resultado.paquete.objetivo.kind === 'enemigo') {
-        botin.append(lineaBotin('Botín', 'No encontraste materiales'));
-      }
       if (recompensas.subioNivel) {
         botin.append(lineaBotin('Nuevo nivel', numero(recompensas.nivelDespues)));
+      }
+      if (recompensas.drops.length) {
+        const rotulo = document.createElement('p');
+        rotulo.className = 'botin__rotulo';
+        rotulo.textContent = 'Botín';
+        const grilla = document.createElement('div');
+        grilla.className = 'botin__items';
+        for (const drop of recompensas.drops) grilla.append(tarjetaItem(drop));
+        botin.append(rotulo, grilla);
+      } else if (resultado.paquete.objetivo.kind === 'enemigo') {
+        botin.append(lineaBotin('Botín', 'No encontraste materiales'));
       }
     } else {
       const sinBotin = document.createElement('p');
@@ -265,9 +309,13 @@
     botones.className = 'resultado__botones';
     const volver = document.createElement('button');
     volver.type = 'button';
-    volver.className = 'boton boton--grande';
+    volver.className = 'boton-imagen';
     volver.id = 'btn-confirmar';
-    volver.textContent = 'Volver a la sala';
+    volver.setAttribute('aria-label', 'Volver a la sala');
+    const imgBoton = document.createElement('img');
+    imgBoton.src = `${RUTA_MARCOS}volver_a_la_sala_${resultado.victoria ? 'victoria' : 'derrota'}.png`;
+    imgBoton.alt = 'Volver a la sala';
+    volver.append(imgBoton);
     volver.addEventListener('click', confirmarYVolver);
     botones.append(volver);
     tarjeta.replaceChildren(titulo, detalle, botin, aviso, error, botones);
@@ -280,7 +328,8 @@
     if (estado.confirmado || estado.confirmando) return;
     estado.confirmando = true;
     $('btn-confirmar').disabled = true;
-    $('btn-confirmar').textContent = 'Guardando…';
+    const avisoGuardado = document.querySelector('.resultado__aviso');
+    if (avisoGuardado) avisoGuardado.textContent = 'Guardando…';
     $('btn-volver').disabled = true;
     try {
       await pedir('/api/combate/confirmar', { method: 'POST' });
@@ -292,7 +341,8 @@
       caja.textContent = error.message;
       caja.hidden = false;
       $('btn-confirmar').disabled = false;
-      $('btn-confirmar').textContent = 'Reintentar y volver a la sala';
+      const avisoGuardado = document.querySelector('.resultado__aviso');
+      if (avisoGuardado) avisoGuardado.textContent = 'No se pudo guardar. Tocá el botón para reintentar.';
       $('btn-volver').disabled = false;
       estado.confirmando = false;
     }

@@ -93,33 +93,43 @@
   grid-row: 1 / 3;
 }
 
+/* ===== Barras de vida con marco (PNG 1024x251) =====
+   La ranura negra del marco esta en:
+     enemigo: x205-939 / y156-188      heroe: x271-895 / y156-188
+   Todo en porcentajes del marco, asi escala sin desalinearse.
+   batalla.js solo toca: #X-vida-relleno (width %), #X-vida-texto, #X-nombre, #X-vida (aria). */
 .vida {
+  --ranura-top: 62.15%;
+  --ranura-alto: 12.75%;
+  position: relative;
   z-index: 1;
-  width: min(100%, 19rem);
-  padding: 0.55rem 0.65rem;
-  border: 1px solid rgba(239, 230, 205, 0.42);
-  border-radius: 0.35rem;
-  background: rgba(12, 19, 23, 0.83);
-  box-shadow: 0 0.4rem 1.4rem rgba(0, 0, 0, 0.35);
+  width: min(100%, 26rem);
+  aspect-ratio: 1024 / 251;
+  filter: drop-shadow(0 0.4rem 0.8rem rgba(0, 0, 0, 0.45));
 }
 
-.vida__rotulo {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-  margin-bottom: 0.35rem;
-  color: #fff;
-  font-size: clamp(0.75rem, 2.4vw, 0.95rem);
-  font-weight: 700;
-  text-shadow: 0 1px 2px #000;
+.vida--jugador { --ranura-izq: 26.46%; --ranura-ancho: 61.04%; }
+.vida--enemigo { --ranura-izq: 20.02%; --ranura-ancho: 71.78%; }
+
+.vida__marco {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  pointer-events: none;
 }
 
+/* La ranura del PNG es negra opaca: el relleno va ENCIMA del marco, recortado a la ranura */
 .vida__fondo {
-  height: 0.85rem;
+  position: absolute;
+  top: calc(var(--ranura-top) + 0.4%);
+  left: var(--ranura-izq);
+  width: var(--ranura-ancho);
+  height: calc(var(--ranura-alto) - 0.8%);
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.32);
-  border-radius: 999px;
-  background: #261e1c;
+  border-radius: 999px / 50%;
+  background: #000;
 }
 
 .vida__relleno {
@@ -130,11 +140,47 @@
 }
 
 .vida__relleno--jugador {
-  background: linear-gradient(90deg, #32894e, #85d476);
+  background: linear-gradient(180deg, #8ff29b, #34b84f 55%, #1b7a30);
+  box-shadow: inset 0 0.12rem 0 rgba(255, 255, 255, 0.3);
 }
 
 .vida__relleno--enemigo {
-  background: linear-gradient(90deg, #a2322a, #ec7864);
+  background: linear-gradient(180deg, #ff8a4a, #d82a14 55%, #8f1308);
+  box-shadow: inset 0 0.12rem 0 rgba(255, 255, 255, 0.25);
+}
+
+/* Nombre: sobre el panel oscuro, arriba de la ranura */
+.vida__nombre {
+  position: absolute;
+  top: 24%;
+  left: var(--ranura-izq);
+  width: var(--ranura-ancho);
+  height: 28%;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  color: #f4e6c4;
+  font: 700 clamp(0.75rem, 2.6vw, 1.15rem)/1 var(--fuente-titulo);
+  text-shadow: 0 2px 0 #000, 0 0 6px #000;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Numero de vida centrado sobre la barra */
+.vida__texto {
+  position: absolute;
+  top: var(--ranura-top);
+  left: var(--ranura-izq);
+  width: var(--ranura-ancho);
+  height: var(--ranura-alto);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: clamp(0.55rem, 1.8vw, 0.85rem);
+  font-weight: 800;
+  text-shadow: 0 1px 0 #000, 1px 0 0 #000, -1px 0 0 #000, 0 -1px 0 #000;
+  pointer-events: none;
 }
 
 .personaje {
@@ -260,65 +306,159 @@
   backdrop-filter: blur(6px);
 }
 
+/* ===== Pantalla de resultado con marcos (PNG 720x552) =====
+   Zona interior util medida: derrota x61-660 / y67-498, victoria x70-652 / y66-495.
+   El padding deja el contenido dentro del marco en ambos. */
 .resultado-tarjeta {
-  width: min(100%, 34rem);
-  padding: clamp(1.25rem, 5vw, 2.3rem);
-  border: 1px solid var(--borde-fuerte);
-  border-top: 5px solid var(--musgo);
-  border-radius: 0.5rem;
-  background: linear-gradient(145deg, #263d4c, #14232d);
-  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.55);
+  --marco: url("../../imagenes/menus/batalla/marco_batalla_victoria.png");
+  --texto-res: #f1e6c8;
+  --acento-res: #e9c352;
+  --linea-res: rgba(233, 195, 82, 0.28);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(98vw, 56rem, calc(94vh * 720 / 552));
+  aspect-ratio: 720 / 552;
+  padding: 10% 11% 9%;
+  background: var(--marco) center / 100% 100% no-repeat;
+  image-rendering: pixelated;
+  color: var(--texto-res);
+  filter: drop-shadow(0 1.5rem 3rem rgba(0, 0, 0, 0.6));
   animation: aparecer 0.35s ease-out both;
 }
 
 .resultado-tarjeta--derrota {
-  border-top-color: var(--sangre);
+  --marco: url("../../imagenes/menus/batalla/marco_batalla_derrota.png");
+  --texto-res: #f3d9c4;
+  --acento-res: #ff9a3c;
+  --linea-res: rgba(255, 130, 50, 0.3);
 }
 
 .resultado__titulo {
-  margin-bottom: 0.4rem;
-  font: 700 clamp(2rem, 8vw, 3.2rem)/1.1 var(--fuente-titulo);
+  margin-bottom: 0.2rem;
+  font: 700 clamp(2.1rem, 7.5vw, 3.8rem)/1.1 var(--fuente-titulo);
   text-align: center;
+  text-shadow: 0 3px 0 #000, 0 0 12px rgba(0, 0, 0, 0.8);
 }
 
 .resultado-tarjeta--victoria .resultado__titulo {
-  color: #9be38e;
+  color: #b9ec86;
 }
 
 .resultado-tarjeta--derrota .resultado__titulo {
-  color: #f18877;
+  color: #ff8a4a;
 }
 
 .resultado__detalle {
-  margin-bottom: 1.4rem;
-  color: var(--texto-suave);
+  margin-bottom: 0.6rem;
+  color: var(--texto-res);
+  font-size: clamp(1rem, 2.8vw, 1.35rem);
   text-align: center;
+  text-shadow: 0 1px 2px #000;
 }
 
+/* el botin ocupa el espacio sobrante y hace scroll si hay muchos items */
 .botin {
-  display: grid;
-  gap: 0.55rem;
-  margin: 1rem 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 auto;
+  gap: 0.4rem;
+  min-height: 10rem;
+  max-height: 21rem;
+  margin: 0 0 0.6rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--acento-res) transparent;
 }
 
 .botin__linea {
+  flex-shrink: 0;
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(165, 184, 196, 0.22);
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--linea-res);
+  font-size: clamp(1rem, 2.8vw, 1.35rem);
+  text-shadow: 0 1px 2px #000;
 }
 
 .botin__linea strong {
-  color: var(--laton);
+  color: var(--acento-res);
   text-align: right;
 }
 
-.resultado__aviso {
-  margin-bottom: 1rem;
-  color: var(--texto-suave);
-  font-size: 0.9rem;
+.botin__rotulo {
+  margin-top: 0.2rem;
+  color: var(--acento-res);
+  font-size: clamp(0.9rem, 2.5vw, 1.15rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
   text-align: center;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px #000;
+}
+
+.botin__items {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr));
+  gap: 0.5rem;
+  justify-items: center;
+}
+
+.botin__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.botin__item-imagen {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: clamp(3.8rem, 11vw, 5.2rem);
+  aspect-ratio: 1;
+  border: 2px solid var(--linea-res);
+  border-radius: 0.4rem;
+  background: rgba(0, 0, 0, 0.45);
+  box-shadow: inset 0 0 0.5rem rgba(0, 0, 0, 0.6);
+}
+
+.botin__item-imagen img {
+  width: 82%;
+  height: 82%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+.botin__item-cantidad {
+  position: absolute;
+  right: 0.15rem;
+  bottom: 0.05rem;
+  color: #fff;
+  font-size: clamp(0.85rem, 2.4vw, 1.15rem);
+  font-weight: 900;
+  text-shadow: 0 1px 0 #000, 1px 0 0 #000, -1px 0 0 #000, 0 -1px 0 #000;
+}
+
+.botin__item-nombre {
+  max-width: 100%;
+  font-size: clamp(0.8rem, 2.2vw, 1rem);
+  line-height: 1.15;
+  text-align: center;
+  text-shadow: 0 1px 2px #000;
+  overflow-wrap: anywhere;
+}
+
+.resultado__aviso {
+  margin-bottom: 0.4rem;
+  color: var(--texto-res);
+  font-size: clamp(0.85rem, 2.3vw, 1.1rem);
+  text-align: center;
+  text-shadow: 0 1px 2px #000;
 }
 
 .resultado__botones {
@@ -326,15 +466,45 @@
   justify-content: center;
 }
 
-.resultado__botones .boton {
+/* boton hecho solo con la imagen (el PNG ya trae el texto) */
+.boton-imagen {
+  width: min(64%, 20rem);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: transform 0.12s, filter 0.12s;
+}
+
+.boton-imagen img {
+  display: block;
   width: 100%;
-  min-height: 3rem;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.boton-imagen:hover:not(:disabled),
+.boton-imagen:focus-visible {
+  transform: translateY(-2px);
+  filter: brightness(1.12);
+  outline: none;
+}
+
+.boton-imagen:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.boton-imagen:disabled {
+  cursor: default;
+  filter: grayscale(0.6) brightness(0.8);
 }
 
 .error-confirmacion {
-  margin-bottom: 0.8rem;
+  margin-bottom: 0.4rem;
   color: #ff9b88;
+  font-size: 1.05rem;
   text-align: center;
+  text-shadow: 0 1px 2px #000;
 }
 
 @keyframes balanceo {
@@ -386,6 +556,19 @@
   }
 }
 
+@media (max-width: 600px) {
+  .resultado-tarjeta {
+    width: 96vw;
+    aspect-ratio: auto;
+    min-height: min(34rem, 92vh);
+    padding: 3.4rem 2.2rem 3rem;
+  }
+
+  .boton-imagen {
+    width: min(80%, 16rem);
+  }
+}
+
 @media (max-width: 520px) {
   .encabezado {
     justify-content: center;
@@ -405,7 +588,7 @@
   }
 
   .vida {
-    padding: 0.4rem;
+    width: 100%;
   }
 
   .personaje {

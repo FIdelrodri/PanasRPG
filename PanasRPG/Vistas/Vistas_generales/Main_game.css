@@ -369,7 +369,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin: 0.8rem 1.1rem;
+  margin: 0rem 1.1rem;
   padding: 0 0.65rem;
   border: 1px solid var(--borde-fuerte);
   border-radius: var(--radio-chico);
