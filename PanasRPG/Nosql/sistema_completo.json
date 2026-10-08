@@ -8003,11 +8003,23 @@
       "ingredients": [
         {
           "materialId": "hierro",
-          "quantity": 8
+          "quantity": 1
         },
         {
-          "materialId": "cuero",
-          "quantity": 3
+          "materialId": "fragmento_mineral",
+          "quantity": 1
+        },
+        {
+          "materialId": "escarcha",
+          "quantity": 1
+        },
+        {
+          "materialId": "escama_draconica",
+          "quantity": 1
+        },
+        {
+          "materialId": "madera_ajedrez",
+          "quantity": 1
         }
       ]
     },
@@ -8020,12 +8032,24 @@
       },
       "ingredients": [
         {
-          "materialId": "hierro",
-          "quantity": 10
+          "materialId": "madera_viva",
+          "quantity": 6
         },
         {
-          "materialId": "madera_viva",
-          "quantity": 5
+          "materialId": "carbón",
+          "quantity": 6
+        },
+        {
+          "materialId": "hielo_compacto",
+          "quantity": 6
+        },
+        {
+          "materialId": "hueso_draconico",
+          "quantity": 7
+        },
+        {
+          "materialId": "marfil",
+          "quantity": 7
         }
       ]
     },
@@ -8038,11 +8062,23 @@
       },
       "ingredients": [
         {
-          "materialId": "hierro",
-          "quantity": 9
+          "materialId": "fibra_resistente",
+          "quantity": 3
         },
         {
-          "materialId": "fibra_resistente",
+          "materialId": "cobre",
+          "quantity": 3
+        },
+        {
+          "materialId": "piel_boreal",
+          "quantity": 3
+        },
+        {
+          "materialId": "cristal_draconico",
+          "quantity": 3
+        },
+        {
+          "materialId": "cristal_tablero",
           "quantity": 4
         }
       ]
@@ -8056,15 +8092,23 @@
       },
       "ingredients": [
         {
-          "materialId": "madera_viva",
-          "quantity": 8
+          "materialId": "cristal_comun",
+          "quantity": 2
         },
         {
-          "materialId": "fibra_forestal",
-          "quantity": 6
+          "materialId": "material_cristal_caverna",
+          "quantity": 2
         },
         {
-          "materialId": "cuero",
+          "materialId": "cristal_helado",
+          "quantity": 2
+        },
+        {
+          "materialId": "escama_draconica",
+          "quantity": 2
+        },
+        {
+          "materialId": "nucleo_real",
           "quantity": 2
         }
       ]
@@ -8078,12 +8122,24 @@
       },
       "ingredients": [
         {
-          "materialId": "hierro",
-          "quantity": 6
+          "materialId": "resina",
+          "quantity": 8
         },
         {
-          "materialId": "obsidiana",
-          "quantity": 3
+          "materialId": "fragmento_mineral",
+          "quantity": 8
+        },
+        {
+          "materialId": "núcleo_glacial",
+          "quantity": 9
+        },
+        {
+          "materialId": "ceniza_eterna",
+          "quantity": 9
+        },
+        {
+          "materialId": "obsidiana_tablero",
+          "quantity": 10
         }
       ]
     },
@@ -8096,12 +8152,24 @@
       },
       "ingredients": [
         {
-          "materialId": "hierro",
-          "quantity": 14
+          "materialId": "semilla_ancestral",
+          "quantity": 11
         },
         {
-          "materialId": "carbón",
-          "quantity": 5
+          "materialId": "obsidiana",
+          "quantity": 11
+        },
+        {
+          "materialId": "piel_boreal",
+          "quantity": 12
+        },
+        {
+          "materialId": "corazon_dragon",
+          "quantity": 12
+        },
+        {
+          "materialId": "marfil",
+          "quantity": 12
         }
       ]
     },
@@ -8114,16 +8182,54 @@
       },
       "ingredients": [
         {
-          "materialId": "madera_viva",
-          "quantity": 7
+          "materialId": "piel_silvestre",
+          "quantity": 4
         },
         {
-          "materialId": "cristal_comun",
+          "materialId": "cobre",
+          "quantity": 4
+        },
+        {
+          "materialId": "cristal_helado",
           "quantity": 5
         },
         {
-          "materialId": "esencia_monstruosa",
-          "quantity": 4
+          "materialId": "hueso_draconico",
+          "quantity": 5
+        },
+        {
+          "materialId": "marfil",
+          "quantity": 5
+        }
+      ]
+    },
+    {
+      "recipeId": "R-ARM-001",
+      "output": {
+        "type": "armor",
+        "id": "cuero_reforzado",
+        "quantity": 1
+      },
+      "ingredients": [
+        {
+          "materialId": "cuero",
+          "quantity": 1
+        },
+        {
+          "materialId": "carbón",
+          "quantity": 1
+        },
+        {
+          "materialId": "hielo_compacto",
+          "quantity": 1
+        },
+        {
+          "materialId": "escama_draconica",
+          "quantity": 1
+        },
+        {
+          "materialId": "madera_ajedrez",
+          "quantity": 1
         }
       ]
     },
@@ -8136,20 +8242,24 @@
       },
       "ingredients": [
         {
-          "materialId": "fibra_forestal",
-          "quantity": 12
+          "materialId": "cuero",
+          "quantity": 3
         },
         {
-          "materialId": "madera_viva",
-          "quantity": 10
+          "materialId": "fragmento_mineral",
+          "quantity": 3
         },
         {
-          "materialId": "piel_silvestre",
-          "quantity": 8
+          "materialId": "hielo_compacto",
+          "quantity": 3
         },
         {
-          "materialId": "esencia_monstruosa",
-          "quantity": 6
+          "materialId": "hueso_draconico",
+          "quantity": 3
+        },
+        {
+          "materialId": "marfil",
+          "quantity": 3
         }
       ]
     },
@@ -8162,20 +8272,54 @@
       },
       "ingredients": [
         {
-          "materialId": "hierro",
-          "quantity": 20
+          "materialId": "semilla_ancestral",
+          "quantity": 6
         },
         {
-          "materialId": "fragmento_mineral",
-          "quantity": 15
+          "materialId": "material_cristal_caverna",
+          "quantity": 6
         },
         {
-          "materialId": "cobre",
-          "quantity": 10
+          "materialId": "cristal_helado",
+          "quantity": 6
         },
         {
-          "materialId": "esencia_monstruosa",
-          "quantity": 12
+          "materialId": "escama_draconica",
+          "quantity": 6
+        },
+        {
+          "materialId": "madera_ajedrez",
+          "quantity": 6
+        }
+      ]
+    },
+    {
+      "recipeId": "R-ARM-002",
+      "output": {
+        "type": "armor",
+        "id": "cristal_caverna",
+        "quantity": 1
+      },
+      "ingredients": [
+        {
+          "materialId": "semilla_ancestral",
+          "quantity": 11
+        },
+        {
+          "materialId": "material_cristal_caverna",
+          "quantity": 11
+        },
+        {
+          "materialId": "cristal_helado",
+          "quantity": 11
+        },
+        {
+          "materialId": "cristal_draconico",
+          "quantity": 11
+        },
+        {
+          "materialId": "cristal_tablero",
+          "quantity": 11
         }
       ]
     },
@@ -8188,20 +8332,24 @@
       },
       "ingredients": [
         {
-          "materialId": "hielo_compacto",
-          "quantity": 20
+          "materialId": "resina",
+          "quantity": 17
+        },
+        {
+          "materialId": "cobre",
+          "quantity": 17
         },
         {
           "materialId": "piel_boreal",
-          "quantity": 15
+          "quantity": 17
         },
         {
-          "materialId": "cristal_helado",
-          "quantity": 12
+          "materialId": "cristal_draconico",
+          "quantity": 17
         },
         {
-          "materialId": "esencia_monstruosa",
-          "quantity": 15
+          "materialId": "cristal_tablero",
+          "quantity": 17
         }
       ]
     },
@@ -8214,20 +8362,24 @@
       },
       "ingredients": [
         {
-          "materialId": "escama_draconica",
-          "quantity": 25
+          "materialId": "piel_silvestre",
+          "quantity": 24
+        },
+        {
+          "materialId": "obsidiana",
+          "quantity": 24
+        },
+        {
+          "materialId": "núcleo_glacial",
+          "quantity": 24
         },
         {
           "materialId": "hueso_draconico",
-          "quantity": 15
+          "quantity": 24
         },
         {
-          "materialId": "ceniza_eterna",
-          "quantity": 15
-        },
-        {
-          "materialId": "cristal_draconico",
-          "quantity": 10
+          "materialId": "marfil",
+          "quantity": 24
         }
       ]
     },
@@ -8240,20 +8392,54 @@
       },
       "ingredients": [
         {
-          "materialId": "obsidiana_tablero",
-          "quantity": 30
+          "materialId": "fibra_forestal",
+          "quantity": 32
         },
         {
-          "materialId": "marfil",
-          "quantity": 20
+          "materialId": "obsidiana",
+          "quantity": 32
         },
         {
-          "materialId": "cristal_tablero",
-          "quantity": 15
+          "materialId": "escarcha",
+          "quantity": 32
+        },
+        {
+          "materialId": "corazon_dragon",
+          "quantity": 32
         },
         {
           "materialId": "nucleo_real",
-          "quantity": 8
+          "quantity": 32
+        }
+      ]
+    },
+    {
+      "recipeId": "R-ARM-003",
+      "output": {
+        "type": "armor",
+        "id": "manto_ancestral",
+        "quantity": 1
+      },
+      "ingredients": [
+        {
+          "materialId": "semilla_ancestral",
+          "quantity": 42
+        },
+        {
+          "materialId": "obsidiana",
+          "quantity": 42
+        },
+        {
+          "materialId": "núcleo_glacial",
+          "quantity": 42
+        },
+        {
+          "materialId": "corazon_dragon",
+          "quantity": 42
+        },
+        {
+          "materialId": "nucleo_real",
+          "quantity": 42
         }
       ]
     },
@@ -8266,20 +8452,24 @@
       },
       "ingredients": [
         {
-          "materialId": "madera_viva",
-          "quantity": 18
+          "materialId": "piel_silvestre",
+          "quantity": 15
         },
         {
-          "materialId": "semilla_ancestral",
-          "quantity": 10
+          "materialId": "obsidiana",
+          "quantity": 15
         },
         {
-          "materialId": "resina",
-          "quantity": 12
+          "materialId": "núcleo_glacial",
+          "quantity": 15
         },
         {
-          "materialId": "esencia_monstruosa",
-          "quantity": 10
+          "materialId": "ceniza_eterna",
+          "quantity": 15
+        },
+        {
+          "materialId": "obsidiana_tablero",
+          "quantity": 15
         }
       ]
     },
@@ -8292,20 +8482,24 @@
       },
       "ingredients": [
         {
-          "materialId": "fragmento_mineral",
-          "quantity": 25
-        },
-        {
-          "materialId": "hierro",
+          "materialId": "semilla_ancestral",
           "quantity": 20
         },
         {
           "materialId": "material_cristal_caverna",
-          "quantity": 12
+          "quantity": 20
         },
         {
-          "materialId": "obsidiana",
-          "quantity": 8
+          "materialId": "cristal_helado",
+          "quantity": 20
+        },
+        {
+          "materialId": "corazon_dragon",
+          "quantity": 20
+        },
+        {
+          "materialId": "nucleo_real",
+          "quantity": 20
         }
       ]
     },
@@ -8318,20 +8512,24 @@
       },
       "ingredients": [
         {
-          "materialId": "hielo_compacto",
+          "materialId": "madera_viva",
           "quantity": 25
         },
         {
-          "materialId": "cristal_helado",
-          "quantity": 20
+          "materialId": "cobre",
+          "quantity": 25
         },
         {
-          "materialId": "núcleo_glacial",
-          "quantity": 8
+          "materialId": "piel_boreal",
+          "quantity": 25
         },
         {
-          "materialId": "escarcha",
-          "quantity": 15
+          "materialId": "cristal_draconico",
+          "quantity": 25
+        },
+        {
+          "materialId": "cristal_tablero",
+          "quantity": 25
         }
       ]
     },
@@ -8344,20 +8542,24 @@
       },
       "ingredients": [
         {
-          "materialId": "escama_draconica",
+          "materialId": "resina",
+          "quantity": 30
+        },
+        {
+          "materialId": "carbón",
+          "quantity": 30
+        },
+        {
+          "materialId": "hielo_compacto",
           "quantity": 30
         },
         {
           "materialId": "hueso_draconico",
-          "quantity": 20
+          "quantity": 30
         },
         {
-          "materialId": "corazon_dragon",
-          "quantity": 3
-        },
-        {
-          "materialId": "cristal_draconico",
-          "quantity": 15
+          "materialId": "marfil",
+          "quantity": 30
         }
       ]
     },
@@ -8370,20 +8572,24 @@
       },
       "ingredients": [
         {
+          "materialId": "fibra_forestal",
+          "quantity": 36
+        },
+        {
+          "materialId": "fragmento_mineral",
+          "quantity": 36
+        },
+        {
+          "materialId": "escarcha",
+          "quantity": 36
+        },
+        {
+          "materialId": "escama_draconica",
+          "quantity": 36
+        },
+        {
           "materialId": "madera_ajedrez",
-          "quantity": 30
-        },
-        {
-          "materialId": "marfil",
-          "quantity": 25
-        },
-        {
-          "materialId": "obsidiana_tablero",
-          "quantity": 20
-        },
-        {
-          "materialId": "nucleo_real",
-          "quantity": 5
+          "quantity": 36
         }
       ]
     },
